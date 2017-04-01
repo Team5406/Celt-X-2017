@@ -27,7 +27,6 @@ public class Subsystems {
 			
 			if(!motor.master){
 				motors[i].changeControlMode(TalonControlMode.Follower);
-				//motors[i].enableBrakeMode(true);
 				motors[i].set(motor.follow); //pass ID of primary motor
 			}else{
 				motors[i].setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
@@ -38,9 +37,8 @@ public class Subsystems {
 				motors[i].setI(subsystem_gearbox.PID_I); 
 				motors[i].setD(subsystem_gearbox.PID_D);
 				motors[i].changeControlMode(subsystem_gearbox.mode);
-				//motors[i].changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-				//motors[i].set(-0.3);
-				//motors[i].enableBrakeMode(true);
+				motors[i].setInverted(subsystem_gearbox.invert);
+
 			}
 		}
 		return motors;

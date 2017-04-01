@@ -33,6 +33,15 @@ public class Climber extends Subsystems{
 		
 	}
 	
+	/*public void ClimbReverse(){
+		climberMotors[0].enable();
+		ClimbReverse(Constants.CLIMBER.target);
+	}
+	
+	public void ClimbReverse(double rpm){
+		climberMotors[0].set(-1*direction*rpm);
+	}*/
+	
 	public void DisplayCurrent(){
 		DisplayCurrent(climberMotors);
 	}

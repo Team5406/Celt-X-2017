@@ -15,6 +15,7 @@ public class Gearbox {
 	public double PID_I;
 	public double PID_D;
 	public Motor[] motors;
+	public boolean invert;
 	    
  
 	public Gearbox(){
