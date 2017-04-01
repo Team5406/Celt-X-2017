@@ -18,12 +18,8 @@ import edu.wpi.cscore.UsbCamera;
 
 
 
-import org.cafirst.frc.team5406.auto.DoNothing;
-import org.cafirst.frc.team5406.auto.AutoStraightGear;
-import org.cafirst.frc.team5406.auto.BallAuto_LeftHopperNoMP;
-import org.cafirst.frc.team5406.auto.BallAuto_RightHopperNoMP;
-import org.cafirst.frc.team5406.auto.AutoStraightOnly;
-import org.cafirst.frc.team5406.auto.AutonomousRoutine;
+import org.cafirst.frc.team5406.auto.*;
+
 
 
 
@@ -58,25 +54,22 @@ public class Robot extends IterativeRobot {
 	private boolean driveBack = false;
 	private boolean autoDone = false;
 	private int autoCounter = 0;
-	private AutoStraightGear straightGear;
-	private AutoStraightOnly straightOnly;
-	private BallAuto_LeftHopperNoMP leftBallAuto = new BallAuto_LeftHopperNoMP(robotDrive, robotIntake, robotShooter);
-	private BallAuto_RightHopperNoMP rightBallAuto = new BallAuto_RightHopperNoMP(robotDrive, robotIntake, robotShooter);
     public static DigitalInput practiceBot = new DigitalInput(Constants.PRACTICE_BOT);
 
 	private AutonomousRoutine selectedRoutine;
 	private SendableChooser<Object> autonomousSelector = new SendableChooser<>();
 	double turretInit = 0;
 	
-	
+	private final boolean CALIBRATION_MODE = false;
+	private Calibration calibrator;
 
 
 
 	@Override
 	public void robotInit() {
-		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+		/*UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 		camera.setResolution(320, 180);
-		camera.setFPS(30);
+		camera.setFPS(30);*/
 		Constants.IS_PRACTICE_BOT = !(practiceBot.get());
 		SmartDashboard.putString("Robot Status", "Initializing");
 		
@@ -92,9 +85,15 @@ public class Robot extends IterativeRobot {
     	autonomousSelector.addDefault("Do Nothing", new DoNothing());
     	autonomousSelector.addObject("Drive Straight", new AutoStraightOnly(robotDrive));
     	autonomousSelector.addObject("Middle Gear", new AutoStraightGear(robotDrive, robotIntake));
+    	autonomousSelector.addObject("Left Gear", new AutoLeftGear(robotDrive, robotIntake));
+    	autonomousSelector.addObject("Right Gear", new AutoRightGear(robotDrive, robotIntake));
     	autonomousSelector.addObject("Balls - Left Hopper", new BallAuto_LeftHopperNoMP(robotDrive, robotIntake, robotShooter));
     	autonomousSelector.addObject("Balls - Right Hopper", new BallAuto_RightHopperNoMP(robotDrive, robotIntake, robotShooter));
-    	
+    	autonomousSelector.addObject("Gear and Balls - Right Hopper", new GearBallRightHopper(robotDrive, robotIntake, robotShooter));
+    	autonomousSelector.addObject("Middle Gear and Right Balls", new StraightGearBallRightHopper(robotDrive, robotIntake, robotShooter));
+    	autonomousSelector.addObject("Middle Gear and Left Balls", new StraightGearBallLeftHopper(robotDrive, robotIntake, robotShooter));
+
+    	calibrator = new Calibration(robotDrive, robotIntake, robotShooter);
     	SmartDashboard.putData("Autonomous", autonomousSelector);
 
 		SmartDashboard.putString("Robot Status", "Running");
@@ -126,6 +125,64 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
+		
+		
+		if(CALIBRATION_MODE){
+			//STEP 1: Drive Forward
+			if(util.applyDeadband(operatorGamepad.getLeftX(), 0.2)!=0){
+				calibrator.driveForward();
+	        }
+			
+			//STEP 2: Align Turret
+			if(operatorGamepad.getButtonHeld(XboxController.X_BUTTON)){
+				calibrator.alignTurret();
+	        }
+			
+			//STEP 3: Spin Up
+			if(operatorGamepad.getRightTriggerPressed()){
+				calibrator.spinUp();
+			}else{
+				calibrator.spinDown();
+			}			
+			
+			//STEP 4: Shoot
+			if(operatorGamepad.getButtonHeld(XboxController.B_BUTTON)){
+				calibrator.shoot();
+	        }else{
+				calibrator.shootStop();
+	        }
+			
+			//STEP 5: Adjust
+			switch(operatorGamepad.getDirectionPad()){
+			case UP:
+				calibrator.changeRPM(10);
+				break;
+			case DOWN:
+				calibrator.changeRPM(-10);
+				break;
+			case LEFT:
+				calibrator.adjustTurret(-10);
+				break;
+			case RIGHT:
+				calibrator.adjustTurret(10);
+				break;
+			}
+
+			//Repeat Steps 1-5
+			
+			//STEP 6: Save File
+			if(operatorGamepad.getButtonHeld(XboxController.Y_BUTTON)){
+				calibrator.saveFile();
+	        }else{
+				//calibrator.shootStop();
+	        }
+			
+			
+			
+			
+			
+		}else{
+		
 
 		/**************************
 		 **** DRIVER FUNCTIONS ****
@@ -184,6 +241,7 @@ public class Robot extends IterativeRobot {
 		 **************************/
 		
 		//Spin intake at full speed when Left Trigger pressed. Reverse intake at full speed when holding Left Bumper. Stop intake if ball pump is not enabled. 
+
 		if(operatorGamepad.getLeftTriggerPressed()){
 			SmartDashboard.putBoolean("Intaking", true);
         	robotIntake.IntakeBalls(1);
@@ -200,17 +258,12 @@ public class Robot extends IterativeRobot {
 
 		//Y-Button: Shoot Close
 		if(operatorGamepad.getButtonHeld(XboxController.Y_BUTTON)){
-			SmartDashboard.putBoolean("Hood Up", false);
-
-			System.out.println("Shift");
-	    	robotShooter.hoodDown(); 
+robotShooter.turnTurretToDegree(-40);
         }
 		
-		//A-Button: Shoot Far
+		//A-Button: Find CCWLimit
 		if(operatorGamepad.getButtonHeld(XboxController.A_BUTTON)){
-			SmartDashboard.putBoolean("Hood Up", true);
-			System.out.println("Hood");
-	    	robotShooter.hoodUp(); 
+			robotShooter.findTurretCCWLimit();
         }
 		//X-Button: Find Turret
 		if(operatorGamepad.getButtonHeld(XboxController.X_BUTTON)){
@@ -283,6 +336,8 @@ public class Robot extends IterativeRobot {
         }else{
 			robotShooter.StopTurret();
         }
+		
+		}
         
 	}
 
@@ -296,6 +351,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledInit() {
 		selectedRoutine.end();
+		robotDrive.driveAtAngleEnd();
 	}
 	
 	@Override

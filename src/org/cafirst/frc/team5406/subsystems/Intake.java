@@ -64,7 +64,7 @@ public class Intake extends Subsystems{
 	
 	public boolean haveGear(){
 		if(Constants.IS_PRACTICE_BOT){
-			return !gearSwitch.get();
+			return gearSwitch.get();
 		}else{
 			return gearSwitch.get();
 		}

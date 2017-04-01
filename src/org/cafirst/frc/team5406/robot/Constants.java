@@ -17,10 +17,10 @@ public final class Constants {
 	public static int CCWLimit = 0;
 	public static int CWLimit = 0;
 	
-	public static int PRACTICE_BOT_LEFT_HOPPER_TURRET_START = -240; //degrees
-	public static int COMP_BOT_LEFT_HOPPER_TURRET_START = -210; //degrees
-	public static int PRACTICE_BOT_RIGHT_HOPPER_TURRET_START = -70; //degrees
-	public static int COMP_BOT_RIGHT_HOPPER_TURRET_START = -30; //degrees
+	public static int PRACTICE_BOT_LEFT_HOPPER_TURRET_START = -270; //degrees
+	public static int COMP_BOT_LEFT_HOPPER_TURRET_START = -240; //degrees
+	public static int PRACTICE_BOT_RIGHT_HOPPER_TURRET_START = -110; //degrees
+	public static int COMP_BOT_RIGHT_HOPPER_TURRET_START = -70; //degrees
 	
 	//drive constants - units in inches
 	public static int WHEEL_BASE = 34;

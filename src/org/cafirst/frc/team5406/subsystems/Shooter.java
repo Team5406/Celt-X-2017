@@ -9,6 +9,7 @@ import org.opencv.core.Point;
 
 
 import com.ctre.CANTalon;
+import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.cscore.AxisCamera;
 import edu.wpi.first.wpilibj.CameraServer;
@@ -52,6 +53,7 @@ public class Shooter extends Subsystems{
 	private boolean degreeTurnInProgress = false;
 
 
+
 	public Shooter(){
 
 		shooterMotors = InitializeMotors(Constants.SHOOTER);
@@ -84,34 +86,45 @@ public class Shooter extends Subsystems{
 	public void Shoot(){
 		System.out.println("Shoot function");
 		shooterMotors[0].enable();
-		Shoot(Constants.SHOOTER.target);
+		Shoot(getRPM());
 	}
 	
-	public void Shoot(double rpm){
+	public double getRPM(){
+		double rpm;
 		if(distance < 0.5){
 			getDistance();
 		}
 		if(Constants.IS_PRACTICE_BOT){
-			rpm = 298.36*distance + 3180.6;
+			//rpm = 298.36*distance + 3180.6;
+			rpm = 0.6372*Math.pow(distance, 2)-51.553*distance+6111.7;
 		}else{
-			rpm = 242*distance + 3400;
+			rpm = 61.49*distance*distance-561.5*distance+6419;
 		}
-		//}
+		return rpm;
+	}
+	
+	public void Shoot(double rpm){
 		shooterMotors[0].changeControlMode(CANTalon.TalonControlMode.Speed);
 		shooterMotors[0].setF(0.5*(1023*600)/(rpm*4096));
     	shooterMotors[0].set(rpm);
     	displayEnc();
-    	
     	SmartDashboard.putNumber("TargetRPM", rpm);
 
 	}
 	
+	public double getImageTop(){
+		Point topRight = listener.getTopRightPoint();
+		return topRight.y;
+	}
+	
 	public void getDistance(){
  		Point topRight = listener.getTopRightPoint();
+ 		SmartDashboard.putNumber("topRight", topRight.y);
  		if(Constants.IS_PRACTICE_BOT){
- 		distance = 0.8779*(0.00007*Math.pow(topRight.y, 2)-0.0002*(topRight.y)+2.5956)+0.6104;
+ 		//distance = 0.8779*(0.00007*Math.pow(topRight.y, 2)-0.0002*(topRight.y)+2.5956)+0.6104;
+ 		distance = (0.3092*topRight.y)-23.674;
  		}else{
- 		distance = 0.8371*(0.00007*Math.pow(topRight.y, 2)-0.0002*(topRight.y)+2.5956)+0.6104;
+ 		distance = 0.92*(0.8371*(0.00007*Math.pow(topRight.y, 2)-0.0002*(topRight.y)+2.5956)+0.6104);
  		}
 	}
 	
@@ -214,6 +227,7 @@ public class Shooter extends Subsystems{
 		return degreeTurnFinished;
 	}
 	
+	
 	public boolean findTurretCCWLimit(){
 		if(!CCWLimitSearching){
 		CCWLimitTimer	 = new Timer();
@@ -228,10 +242,10 @@ public class Shooter extends Subsystems{
     	boolean turn = true;
     	double turnTicks = 0;
     	//need to make it go the other way if possible to reach target (edge case);
-    	
+    	System.out.println("Boiler visible"  + listener.getBoilerVisible());
     	if(listener.getBoilerVisible()){
     		getDistance();
-     		double center = (Constants.IMAGE_WIDTH/2)-20-Constants.IMAGE_WIDTH*((Math.tan(Constants.CAMERA_OFFSET/(distance*12)))*(180/Math.PI)/Constants.AXIS_FOV);
+     		double center = (Constants.IMAGE_WIDTH/2)-Constants.IMAGE_WIDTH*((Math.tan(Constants.CAMERA_OFFSET/(distance*12)))*(180/Math.PI)/Constants.AXIS_FOV);
     		double centerOffset = center-Constants.centerX;
         	
     		SmartDashboard.putNumber("distance", distance);
@@ -260,8 +274,8 @@ public class Shooter extends Subsystems{
     	if(Math.abs(turnTicks) > 0.15){
     		turnTicks = Math.signum(turnTicks)*0.15;
     	}
+    	System.out.println("Ticks: " + turnTicks);
     	
-    	SmartDashboard.putNumber("turnTicks", turnTicks);
 
     	
     	
@@ -280,6 +294,9 @@ public class Shooter extends Subsystems{
     	}
     	
     	if(turn){
+        	SmartDashboard.putNumber("Position", turretMotors[0].getPosition());
+        	SmartDashboard.putNumber("turnTicks", turnTicks);
+
     		turretPosition = turretMotors[0].getPosition()+turnTicks;
         	SmartDashboard.putNumber("turretSetPosition", turretPosition);
     		turretMotors[0].set(turretPosition);
@@ -334,7 +351,7 @@ public class Shooter extends Subsystems{
 	    		Constants.CWLimit = turretMotors[0].getEncPosition();
 	    		autoTurretDirection = 1;
 	    	}
-	    	
+	    		
 	    	if(turn){
 	    		turretPosition = turretMotors[0].getPosition()+turnTicks;
 	    		turretMotors[0].set(turretPosition);
@@ -397,10 +414,74 @@ public class Shooter extends Subsystems{
 	        }
 	}
 	
+	
+	/*class turnToDegreeSpeed extends TimerTask {
+    	private boolean turn = true;
+    	private double turnRPM = 0;
+    	
+    	private double turnDegrees = 0;
+    	double targetPosition;
+    	
+    	public turnToDegreeSpeed(double _turnDegrees){
+    		turnDegrees = _turnDegrees;
+    		degreeTurnFinished = 0;
+    		turretMotors[0].changeControlMode(TalonControlMode.Speed);
+    	}
+    	
+    	
+
+	    public void run() {
+			targetPosition =   (Constants.CCWLimit +(turnDegrees/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
+	    	System.out.println("targetPosition: " + targetPosition + ", current: " + turretMotors[0].getPosition());
+	    	
+			if (CCWLimitFound){
+		    	SmartDashboard.putNumber("targetPosition", targetPosition);
+		    	SmartDashboard.putNumber("turretPosition", turretMotors[0].getPosition());
+				if(turretMotors[0].getPosition() > targetPosition - 0.1 && turretMotors[0].getPosition() < targetPosition + 0.1){
+					degreeTurnFinished = 1;
+		    		turretMotors[0].set(0);
+		    		turretMotors[0].changeControlMode(TalonControlMode.Position);
+		    		turretMotors[0].set(turretMotors[0].getEncPosition());
+		    		turningTurretTimer.cancel();
+		    		turningTurretTimer.purge();
+				}else{
+				turnRPM = -10;
+				boolean ccw_limit = !turretLimitSwitchCCW.get();
+		    	boolean cw_limit = !turretLimitSwitchCW.get();
+		    	//clockwise is negative ticks; 29422 ticks for full motion
+		    	if(ccw_limit){
+		    		turn = (turnRPM < 0);	
+		    		autoTurretDirection = -1;
+		    		Constants.CCWLimit = turretMotors[0].getEncPosition();
+		    	}else if (cw_limit){
+		    		turn = (turnRPM > 0);		
+		    		Constants.CWLimit = turretMotors[0].getEncPosition();
+		    		autoTurretDirection = 1;
+		    	}
+		    	
+		    	if(turn){
+		    		turretMotors[0].set(turnRPM);
+		    	}else{
+		    		degreeTurnFinished = -1;
+		    	}
+				}
+			
+			}
+
+	    	
+	        }
+	}*/
+	
 	public void stopTimer(){
+		if(centeringTurret !=null){
 		centeringTurret.cancel();
+		}
+		if(CCWLimitTimer !=null){
 		CCWLimitTimer.cancel();
+		}
+		if(turningTurretTimer !=null){
 		turningTurretTimer.cancel();
+		}
 	}
     
     
