@@ -21,7 +21,7 @@ public class GearBallRightHopper  extends AutonomousRoutine{
 
 
 	public GearBallRightHopper(Drive _robotDrive, Intake _robotIntake, Shooter _robotShooter){
-		super("GearBall_RightHopper");
+		super("Right Gear and Right Balls");
 		robotDrive = _robotDrive;
 		robotIntake = _robotIntake;
 		robotShooter = _robotShooter;
@@ -85,6 +85,7 @@ public class GearBallRightHopper  extends AutonomousRoutine{
 		    	            	autoStep = 2;
 		    	            	robotDrive.resetPosition();
 		    	            	robotDrive.driveAtAngleUpdate(-200, -30.0, false);
+		    	            	this.cancel();
 		    	            }
 		    	        }, 
 		    	        500 

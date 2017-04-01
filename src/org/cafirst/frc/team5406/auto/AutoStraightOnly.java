@@ -15,7 +15,7 @@ public class AutoStraightOnly  extends AutonomousRoutine{
 	
 
 	public AutoStraightOnly(Drive _robotDrive){
-		super("AutoStraightOnly");
+		super("8 - Drive Straight");
 		robotDrive = _robotDrive;
 	}
 	

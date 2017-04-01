@@ -82,16 +82,16 @@ public class Robot extends IterativeRobot {
     	operatorGamepad = new XboxController(0);
     	driverGamepad = new XboxController(1);
     	
-    	autonomousSelector.addDefault("Do Nothing", new DoNothing());
-    	autonomousSelector.addObject("Drive Straight", new AutoStraightOnly(robotDrive));
-    	autonomousSelector.addObject("Middle Gear", new AutoStraightGear(robotDrive, robotIntake));
-    	autonomousSelector.addObject("Left Gear", new AutoLeftGear(robotDrive, robotIntake));
-    	autonomousSelector.addObject("Right Gear", new AutoRightGear(robotDrive, robotIntake));
-    	autonomousSelector.addObject("Balls - Left Hopper", new BallAuto_LeftHopperNoMP(robotDrive, robotIntake, robotShooter));
-    	autonomousSelector.addObject("Balls - Right Hopper", new BallAuto_RightHopperNoMP(robotDrive, robotIntake, robotShooter));
-    	autonomousSelector.addObject("Gear and Balls - Right Hopper", new GearBallRightHopper(robotDrive, robotIntake, robotShooter));
-    	autonomousSelector.addObject("Middle Gear and Right Balls", new StraightGearBallRightHopper(robotDrive, robotIntake, robotShooter));
-    	autonomousSelector.addObject("Middle Gear and Left Balls", new StraightGearBallLeftHopper(robotDrive, robotIntake, robotShooter));
+    	autonomousSelector.addDefault("0 - Do Nothing", new DoNothing());
+    	autonomousSelector.addObject("1 - Middle Gear", new AutoStraightGear(robotDrive, robotIntake));
+    	autonomousSelector.addObject("2 - Balls Only - Left Hopper", new BallAuto_LeftHopperNoMP(robotDrive, robotIntake, robotShooter));
+    	autonomousSelector.addObject("3 - Balls Only - Right Hopper", new BallAuto_RightHopperNoMP(robotDrive, robotIntake, robotShooter));
+    	//autonomousSelector.addObject("6 - Left Gear", new AutoLeftGear(robotDrive, robotIntake));
+    	//autonomousSelector.addObject("7 - Right Gear", new AutoRightGear(robotDrive, robotIntake));
+    	autonomousSelector.addObject("8 - Drive Straight", new AutoStraightOnly(robotDrive));
+     	autonomousSelector.addObject("9 - Middle Gear and Right Balls", new StraightGearBallRightHopperBack(robotDrive, robotIntake, robotShooter));
+    	autonomousSelector.addObject("10 - Middle Gear and Left Balls", new StraightGearBallLeftHopperBack(robotDrive, robotIntake, robotShooter));
+    	//autonomousSelector.addObject("Gear and Balls - Right Hopper", new GearBallRightHopper(robotDrive, robotIntake, robotShooter));
 
     	calibrator = new Calibration(robotDrive, robotIntake, robotShooter);
     	SmartDashboard.putData("Autonomous", autonomousSelector);
@@ -116,6 +116,7 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopInit() {
+		selectedRoutine.end();
 		SmartDashboard.putString("Robot Status", "Teleop");
 		robotClimber.direction_switch = false;
 	}
@@ -207,6 +208,9 @@ public class Robot extends IterativeRobot {
 		if(driverGamepad.getButtonHeld(XboxController.RIGHT_BUMPER)){
 			System.out.println("Climbing");
         	robotClimber.Climb();
+		}else if(driverGamepad.getRightTriggerPressed()){
+			System.out.println("Climbing Reverse");
+        	robotClimber.ClimbReverse();
         }else{
         	robotClimber.StopClimb();
         }
@@ -218,9 +222,9 @@ public class Robot extends IterativeRobot {
         	robotClimber.ClimbReverse();
         }else{
         	robotClimber.StopClimb();
-        }*/
+        }
 		
-		
+		*/
 		//Turn climber motors when holding Right Bumper
 		if(driverGamepad.getLeftTriggerPressed()){
 			System.out.println("Precision Drive");

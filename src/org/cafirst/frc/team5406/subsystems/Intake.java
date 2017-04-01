@@ -25,6 +25,8 @@ public class Intake extends Subsystems{
 	public Intake(){
 		intakeMotors = InitializeMotors(Constants.INTAKE);
 		intakeMotors[0].setVoltageRampRate(50);
+		intakeMotors[0].setAllowableClosedLoopErr(10);
+		intakeMotors[0].setCurrentLimit(20);
 	}
 	
 	public void IntakeBalls(){

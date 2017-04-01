@@ -6,7 +6,7 @@ import org.cafirst.frc.team5406.auto.AutonomousRoutine;
 public class DoNothing extends AutonomousRoutine{
 
 	public DoNothing() {
-		super("Do Nothing");
+		super("0 - Do Nothing");
 	}
 
 	@Override

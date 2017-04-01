@@ -43,6 +43,9 @@ public class Drive extends Subsystems{
 				
 		leftDriveMotors = InitializeMotors(Constants.LEFT_DRIVE);
 		rightDriveMotors = InitializeMotors(Constants.RIGHT_DRIVE);
+		leftDriveMotors[0].setAllowableClosedLoopErr(20);
+		rightDriveMotors[0].setAllowableClosedLoopErr(20);
+
 		leftDriveMotors[0].setVoltageRampRate(100);
 		rightDriveMotors[0].setVoltageRampRate(100);
 		shiftSolenoid = new DoubleSolenoid(Constants.SHIFT_FORWARD, Constants.SHIFT_REVERSE);
@@ -101,6 +104,9 @@ public class Drive extends Subsystems{
 		}
 		leftDriveMotors[0].changeControlMode(TalonControlMode.PercentVbus);
 		rightDriveMotors[0].changeControlMode(TalonControlMode.PercentVbus);
+		leftDriveMotors[0].set(0);
+		rightDriveMotors[0].set(0);
+		
 	}
 	
 
@@ -141,14 +147,22 @@ public class Drive extends Subsystems{
 		double dSpeed = 0;
 		double speedChangeMultiplier = 0;
 		if(correct){
+			System.out.println("Angle: " + angle + ", currentAngle: " + currentAngle);
+
 		speedChangeMultiplier = calcSpeed(angle - currentAngle);
+		System.out.println("SpeedChangeMultiplier: " + speedChangeMultiplier);
+
 	    	//System.out.println("speedChangeMultiplier" + speedChangeMultiplier);
-	    	dSpeed = speed*speedChangeMultiplier;
+	    	dSpeed = speed*speedChangeMultiplier; //speed=400, 0-->90; +3*400=1200
+	    	if(Math.abs(dSpeed)>0.3*(Math.abs(speed))){
+	    		dSpeed = Math.signum(dSpeed)*0.7*Math.abs(speed);
+	    	}
 		}
 		SmartDashboard.putNumber("speedChangeMultiplier", speedChangeMultiplier);
 		SmartDashboard.putNumber("Heading-DriveStraight", Constants.navX.getYaw());
-		leftSpeed = -1*speed-dSpeed;
-		rightSpeed = speed-dSpeed;
+		leftSpeed =-1*speed-Math.signum(speed)*dSpeed; //-1*400-1200 = -1800
+		rightSpeed = speed-Math.signum(speed)*dSpeed; //400-1200 = -800
+		System.out.println("Left: " + leftSpeed + ", Right: " + rightSpeed + ", dSpeed: " + dSpeed);
 		
 		SmartDashboard.putNumber("Left Speed", leftSpeed);
 		SmartDashboard.putNumber("Right Speed", rightSpeed);

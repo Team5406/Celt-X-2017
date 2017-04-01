@@ -15,13 +15,13 @@ public class BallAuto_LeftHopperNoMP  extends AutonomousRoutine{
 	private boolean gearDelay = false;
 	private double[] robotPosition;
 	private int direction = 1;
-	private boolean done_before = false;
+	private boolean turretAligned = false;
 	private boolean readyToShoot = false;
 	
 
 
 	public BallAuto_LeftHopperNoMP(Drive _robotDrive, Intake _robotIntake, Shooter _robotShooter){
-		super("BallAuto_LeftHopper");
+		super("2 - Balls Only - Left Hopper");
 		robotDrive = _robotDrive;
 		robotIntake = _robotIntake;
 		robotShooter = _robotShooter;
@@ -36,7 +36,7 @@ public class BallAuto_LeftHopperNoMP  extends AutonomousRoutine{
 		robotDrive.enableBrake(true);
 		robotDrive.driveAtAngleInit(400, 0.0, true);
 		direction = (Constants.IS_PRACTICE_BOT?1:-1);
-		robotShooter.alignTurret();
+		//robotShooter.alignTurret();
 		robotShooter.Shoot();
 		robotShooter.BallPump(-1);
 		
@@ -65,7 +65,7 @@ public class BallAuto_LeftHopperNoMP  extends AutonomousRoutine{
 		case 0:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (0) " + direction*robotPosition[1]);
-			if( direction*robotPosition[1] > ((150-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( direction*robotPosition[1] > ((157-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(0.0, -90.0, true);
             	robotDrive.resetPosition();
 				autoStep = 1;
@@ -84,12 +84,14 @@ public class BallAuto_LeftHopperNoMP  extends AutonomousRoutine{
 		    	            public void run() {
 		    	            	autoStep = 2;
 		    	            	robotDrive.resetPosition();
-		    					robotDrive.driveAtAngleUpdate(-110, -95.0, true);
+		    					robotDrive.driveAtAngleUpdate(-110, 0.0, true);
+		    					this.cancel();
 		    	            }
 		    	        }, 
 		    	        1000 
 		    	);
 			}
+			
 			break;
 		case 2:
 			robotPosition = robotDrive.getPosition();
@@ -98,19 +100,29 @@ public class BallAuto_LeftHopperNoMP  extends AutonomousRoutine{
 			//9.4814453125
 			//3.9788735772973833
 
-			
+			System.out.println(System.nanoTime() + " Robot Position" + direction*robotPosition[1]);
+
 	
-			if( direction*robotPosition[1] < (10/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAtAngleUpdate(-110, -95.0, true);
+			if( Math.abs(direction*robotPosition[1]) < (50/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(-110, 0.0, true);
+				System.out.println(System.nanoTime() + " Drive at Angle");
 			}else{
+			robotDrive.driveAtAngleUpdate(0, 0.0, true);
 			robotDrive.driveAtAngleEnd();
-			if(!done_before && turretInit ==1){
+			System.out.println(System.nanoTime() + " Drive at Angle End");
+			if(!turretAligned && turretInit != 0){
 				robotShooter.alignTurret();
-				done_before = true;
+				System.out.println(System.nanoTime() + " Aligning Turret");
+				turretAligned = true;
 			}else if (!robotShooter.centeringInProgress && !readyToShoot){
 				robotShooter.getDistance();
+				System.out.println(System.nanoTime() + " Getting Distance");
+
 				readyToShoot = true;
-			}else if (readyToShoot){
+			}
+			
+			if (readyToShoot){
+				System.out.println(System.nanoTime() + " Shooting");
 				robotShooter.getDistance();
 				robotShooter.Shoot();
 				robotShooter.Indexer(865);				

@@ -12,8 +12,14 @@ public class Climber extends Subsystems{
 	private CANTalon[] climberMotors;
 	private int direction = 1;
 	public boolean direction_switch = false;
+	private int climberSpinning = 0;
 	public Climber(){
 		climberMotors = InitializeMotors(Constants.CLIMBER);
+		climberMotors[0].setCurrentLimit(30);
+		climberMotors[1].setCurrentLimit(30);
+		climberMotors[0].EnableCurrentLimit(true);
+		climberMotors[1].EnableCurrentLimit(true);
+	
 	}
 	
 	public void Climb(){
@@ -29,18 +35,25 @@ public class Climber extends Subsystems{
 			direction *= -1;
 			direction_switch = true;
 		}
+		if(climberMotors[0].getOutputCurrent() < 20){
+			climberSpinning++;
+		}
+		if(climberSpinning > 20){
+			climberMotors[0].EnableCurrentLimit(false);
+			climberMotors[1].EnableCurrentLimit(false);
+		}
 		climberMotors[0].set(direction*rpm);
 		
 	}
 	
-	/*public void ClimbReverse(){
+	public void ClimbReverse(){
 		climberMotors[0].enable();
 		ClimbReverse(Constants.CLIMBER.target);
 	}
 	
 	public void ClimbReverse(double rpm){
 		climberMotors[0].set(-1*direction*rpm);
-	}*/
+	}
 	
 	public void DisplayCurrent(){
 		DisplayCurrent(climberMotors);

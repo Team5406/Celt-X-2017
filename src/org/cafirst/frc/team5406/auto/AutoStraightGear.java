@@ -17,7 +17,7 @@ public class AutoStraightGear  extends AutonomousRoutine{
 	
 
 	public AutoStraightGear(Drive _robotDrive, Intake _robotIntake){
-		super("AutoStraightGear");
+		super("1 - Middle Gear");
 		robotDrive = _robotDrive;
 		robotIntake = _robotIntake;
 	}
@@ -64,6 +64,7 @@ public class AutoStraightGear  extends AutonomousRoutine{
 		    	            	autoStep = 2;
 		    	            	robotDrive.resetPosition();
 		    	            	robotDrive.driveAtAngleUpdate(-200, 0.0, false);
+		    	            	//Do we need a this.cancel();?
 		    	            }
 		    	        }, 
 		    	        500 

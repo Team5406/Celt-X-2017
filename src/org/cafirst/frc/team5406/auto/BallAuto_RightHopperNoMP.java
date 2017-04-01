@@ -15,13 +15,13 @@ public class BallAuto_RightHopperNoMP  extends AutonomousRoutine{
 	private boolean gearDelay = false;
 	private double[] robotPosition;
 	private int direction = 1;
-	private boolean done_before = false;
+	private boolean turretAligned = false;
 	private boolean readyToShoot = false;
 	
 
 
 	public BallAuto_RightHopperNoMP(Drive _robotDrive, Intake _robotIntake, Shooter _robotShooter){
-		super("BallAuto_RightHopper");
+		super("3 - Balls Only - Right Hopper");
 		robotDrive = _robotDrive;
 		robotIntake = _robotIntake;
 		robotShooter = _robotShooter;
@@ -34,9 +34,9 @@ public class BallAuto_RightHopperNoMP  extends AutonomousRoutine{
 		autoStep =0;
 		gearDelay = false;
 		robotDrive.enableBrake(true);
-		robotDrive.driveAtAngleInit(200, 0.0, true);
+		robotDrive.driveAtAngleInit(400, 0.0, true);
 		direction = (Constants.IS_PRACTICE_BOT?1:-1);
-		robotShooter.alignTurret();
+		//robotShooter.alignTurret();
 		robotShooter.Shoot();
 		robotShooter.BallPump(-1);
 	}
@@ -64,20 +64,20 @@ public class BallAuto_RightHopperNoMP  extends AutonomousRoutine{
 		case 0:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (0) " + direction*robotPosition[0]);
-			if( direction*robotPosition[0] > ((180-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( direction*robotPosition[0] > ((184-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(0.0, 90.0, true);
 				autoStep = 1;
-			} else if( direction*robotPosition[0] > ((120-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( direction*robotPosition[0] > ((124-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(400, 90.0, true);
-			}else if ( direction*robotPosition[0] > ((82-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			}else if ( direction*robotPosition[0] > ((86-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(400, 45.0, true);
 			}
 			break;
 		case 1:
 			robotDrive.driveAtAngleEnd();
-			if(!done_before && turretInit ==1){
+			if(!turretAligned && turretInit != 0){
 				robotShooter.alignTurret();
-				done_before = true;
+				turretAligned = true;
 			}else if (!robotShooter.centeringInProgress && !readyToShoot){
 				robotShooter.getDistance();
 				readyToShoot = true;

@@ -43,7 +43,7 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 	            int small = 0;
 	            
 	            for(int i = 0; i < pipeline.findContoursOutput().size(); i++)
-	            	if(Imgproc.boundingRect(pipeline.findContoursOutput().get(i)).width > 5)
+	            	if(Imgproc.boundingRect(pipeline.findContoursOutput().get(i)).width > 37)
 	            	{
 	            		small = i;
 	            		break;
@@ -51,12 +51,11 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 	            
 	            pipeline.findContoursOutput().get(small).convertTo(smallContour, CvType.CV_32F);
 	            
-	            Rect r = Imgproc.boundingRect(pipeline.findContoursOutput().get(small));
-	            
+	            Rect r = Imgproc.boundingRect(pipeline.findContoursOutput().get(small));          
 	            int big = 0;
 	            
 	            for(int i = small + 1; i < pipeline.findContoursOutput().size(); i++)
-	            	if(Imgproc.boundingRect(pipeline.findContoursOutput().get(i)).width > 5)
+	            	if(Imgproc.boundingRect(pipeline.findContoursOutput().get(i)).width > 37)
 	            	{
 	            		big = i;
 	            		break;
@@ -132,7 +131,8 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 	            SmartDashboard.putNumber("BigHeight", bigHeight);
 	            
 	            SmartDashboard.putNumber("Vision Length", length);
-	            boilerVisible = true;
+	            SmartDashboard.putNumber("Contours", pipeline.findContoursOutput().size());
+	            boilerVisible = (Imgproc.boundingRect(pipeline.findContoursOutput().get(small)).width > 37) && (Imgproc.boundingRect(pipeline.findContoursOutput().get(big)).width > 37);
 	            frameCount++;
 		}
 		
