@@ -111,6 +111,8 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		robotShooter.getLimitSwitches();
+
 		selectedRoutine.periodic();
 	}
 
@@ -126,7 +128,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		
+		robotShooter.getLimitSwitches();
 		
 		if(CALIBRATION_MODE){
 			//STEP 1: Drive Forward
@@ -362,6 +364,7 @@ robotShooter.turnTurretToDegree(-40);
     public void disabledPeriodic(){  
 		selectedRoutine = (AutonomousRoutine) autonomousSelector.getSelected();
 		SmartDashboard.putString("Selected Autonomous", selectedRoutine.getName());
+		robotShooter.getLimitSwitches();
     }
 }
 

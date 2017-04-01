@@ -92,6 +92,11 @@ public class Shooter extends Subsystems{
 		SmartDashboard.putBoolean("CW Limit", false);
 	}
 	
+	public void getLimitSwitches(){
+		SmartDashboard.putBoolean("FWD Limit", turretMotors[0].isFwdLimitSwitchClosed());
+		SmartDashboard.putBoolean("REV Limit", turretMotors[0].isRevLimitSwitchClosed());
+	}
+	
 	public void Shoot(){
 		System.out.println("Shoot function");
 		shooterMotors[0].enable();
