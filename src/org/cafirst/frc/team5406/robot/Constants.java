@@ -14,8 +14,8 @@ public final class Constants {
 	
 	//centerX is not a constant - it will be changed dynamically
 	public static double centerX = 0;
-	public static int CCWLimit = 0;
-	public static int CWLimit = 0;
+	public static int REVLimit = 0;
+	public static int FWDLimit = 0;
 	
 	public static int PRACTICE_BOT_LEFT_HOPPER_TURRET_START = -270; //degrees
 	public static int COMP_BOT_LEFT_HOPPER_TURRET_START = -220; //degrees

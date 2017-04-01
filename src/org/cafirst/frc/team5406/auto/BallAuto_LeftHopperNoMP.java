@@ -50,7 +50,7 @@ public class BallAuto_LeftHopperNoMP  extends AutonomousRoutine{
 	public void periodic(){
 		System.out.println("Auto Step (Straight Gear): " + autoStep);
 		double turretInit = 0;
-		if (robotShooter.findTurretCCWLimit() && turretInit == 0){
+		if (robotShooter.findTurretREVLimit() && turretInit == 0){
 			if(Constants.IS_PRACTICE_BOT){
 				turretInit = robotShooter.turnTurretToDegree(Constants.PRACTICE_BOT_LEFT_HOPPER_TURRET_START);
 			}else{

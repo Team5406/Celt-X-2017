@@ -269,7 +269,7 @@ robotShooter.turnTurretToDegree(-40);
 		
 		//A-Button: Find CCWLimit
 		if(operatorGamepad.getButtonHeld(XboxController.A_BUTTON)){
-			robotShooter.findTurretCCWLimit();
+			robotShooter.findTurretREVLimit();
         }
 		//X-Button: Find Turret
 		if(operatorGamepad.getButtonHeld(XboxController.X_BUTTON)){

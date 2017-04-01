@@ -42,13 +42,13 @@ public class Shooter extends Subsystems{
 	private long time_offset =0;
 	private long lastFrame = -1;
 	private Timer centeringTurret;
-	private Timer CCWLimitTimer;
+	private Timer REVLimitTimer;
 	private Timer turningTurretTimer;
 	public boolean centeringInProgress = false;
-	public boolean CCWLimitSearching = false;
+	public boolean REVLimitSearching = false;
 	private int autoTurretDirection = -1;
 	private double distance;
-	private boolean CCWLimitFound = false;
+	private boolean REVLimitFound = false;
 	private int degreeTurnFinished = 0; //-1 = error; 0 = in progress; 1 = done
 	private boolean degreeTurnInProgress = false;
 	private int turretTimerRunning = 0;
@@ -65,8 +65,6 @@ public class Shooter extends Subsystems{
 		ballPumpMotors = InitializeMotors(Constants.BALL_PUMP);
 		ballPumpMotors[0].setAllowableClosedLoopErr(20);
 
-		turretLimitSwitchCW = new DigitalInput(Constants.CW_LIMIT_SWITCH);
-		turretLimitSwitchCCW = new DigitalInput(Constants.CCW_LIMIT_SWITCH);
 
 		turretMotors = InitializeMotors(Constants.TURRET);
 		shooterSolenoid = new DoubleSolenoid(Constants.HOOD_FORWARD, Constants.HOOD_REVERSE);
@@ -75,6 +73,7 @@ public class Shooter extends Subsystems{
 		//turretMotors[0].enableBrakeMode(true);
 		turretMotors[0].setCurrentLimit(10);
 		turretMotors[0].EnableCurrentLimit(true);
+		turretMotors[0].enableLimitSwitch(true, true);
 		turretMotors[0].setAllowableClosedLoopErr(10);
 		
 		time_offset = System.nanoTime();
@@ -161,24 +160,24 @@ public class Shooter extends Subsystems{
 	
 	public boolean moveTurret(double amount){
 		boolean turn = true;
-		boolean ccw_limit = !turretLimitSwitchCCW.get();
-		boolean cw_limit = !turretLimitSwitchCW.get();
+		boolean rev_limit = turretMotors[0].isRevLimitSwitchClosed();
+		boolean fwd_limit = turretMotors[0].isFwdLimitSwitchClosed();
 		//clockwise is negative ticks; 29422 ticks for full motion
-		if(ccw_limit){
+		if(rev_limit){
 			turn = (amount < 0);	
     		resetTurret();
     		autoTurretDirection = -1;
-    		Constants.CCWLimit = turretMotors[0].getEncPosition();
-		}else if (cw_limit){
+    		Constants.REVLimit = turretMotors[0].getEncPosition();
+		}else if (fwd_limit){
 			turn = (amount > 0);		
-			Constants.CWLimit = turretMotors[0].getEncPosition();
+			Constants.FWDLimit = turretMotors[0].getEncPosition();
     		autoTurretDirection = 1;
 		}
 		if(turn){
 			turretPosition = turretMotors[0].getPosition()+amount;
 			turretMotors[0].set(turretPosition);
 		}
-		return ccw_limit || cw_limit;
+		return rev_limit || fwd_limit;
 	}
 	
 	public void turnTurret(double ticks, boolean overRideVision){
@@ -245,13 +244,13 @@ public class Shooter extends Subsystems{
 	}
 	
 	
-	public boolean findTurretCCWLimit(){
-		if(!CCWLimitSearching){
-		CCWLimitTimer	 = new Timer();
-		CCWLimitTimer.schedule(new findCCWLimit(), 0L, 2L); //time in milliseconds
-		CCWLimitSearching = true;
+	public boolean findTurretREVLimit(){
+		if(!REVLimitSearching){
+		REVLimitTimer	 = new Timer();
+		REVLimitTimer.schedule(new findREVLimit(), 0L, 2L); //time in milliseconds
+		REVLimitSearching = true;
 		}
-		return CCWLimitFound;
+		return REVLimitFound;
 	}
 	
 	class centerTurret extends TimerTask {
@@ -318,8 +317,8 @@ public class Shooter extends Subsystems{
 
     	
     	SmartDashboard.putNumber("CenterX", Constants.centerX);
-    	SmartDashboard.putNumber("CCWLimit_num", Constants.CCWLimit);
-    	SmartDashboard.putNumber("CWLimit_num", Constants.CWLimit);
+    	SmartDashboard.putNumber("REVLimit_num", Constants.REVLimit);
+    	SmartDashboard.putNumber("FWDLimit_num", Constants.FWDLimit);
 
         
         }else{
@@ -331,33 +330,33 @@ public class Shooter extends Subsystems{
 	
 	
 	
-	class findCCWLimit extends TimerTask {
+	class findREVLimit extends TimerTask {
 		//Turret Timer 2
     	boolean turn = true;
     	double turnTicks = 0;
     	
-    	public findCCWLimit(){
+    	public findREVLimit(){
     		
     	}
 
 	    public void run() {
 	    	if(turretTimerRunning ==0 || turretTimerRunning ==2){
 	    		turretTimerRunning = 2;
-			if (!CCWLimitFound){
+			if (!REVLimitFound){
 				 turnTicks = 0.1;
 			}
 	    	SmartDashboard.putNumber("turretPosition", turretMotors[0].getPosition());
-	    	SmartDashboard.putBoolean("CCWLimitFound", CCWLimitFound);
-	    	SmartDashboard.putNumber("CCWLimit", Constants.CCWLimit);
+	    	SmartDashboard.putBoolean("REVLimitFound", REVLimitFound);
+	    	SmartDashboard.putNumber("REVLimit", Constants.REVLimit);
 	    	moveTurret(turnTicks);
 
-	    	if(Constants.CCWLimit !=0){
+	    	if(Constants.REVLimit !=0){
 	    		resetTurret();
-	    		Constants.CCWLimit = turretMotors[0].getEncPosition();
+	    		Constants.REVLimit = turretMotors[0].getEncPosition();
 	    		turretTimerRunning = 0;
-	    		CCWLimitFound = true;
-	    		CCWLimitTimer.cancel();
-	    		CCWLimitTimer.purge();
+	    		REVLimitFound = true;
+	    		REVLimitTimer.cancel();
+	    		REVLimitTimer.purge();
 	    	}
 	        }
 	    }
@@ -379,10 +378,10 @@ public class Shooter extends Subsystems{
 
 	    public void run() {
 	    	if(turretTimerRunning ==0||turretTimerRunning ==3){
-			targetPosition =   (Constants.CCWLimit +(turnDegrees/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
+			targetPosition =   (Constants.REVLimit +(turnDegrees/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
 	    	System.out.println("targetPosition: " + targetPosition + ", current: " + turretMotors[0].getPosition());
 	    	
-			if (CCWLimitFound){
+			if (REVLimitFound){
 		    	SmartDashboard.putNumber("targetPosition", targetPosition);
 		    	SmartDashboard.putNumber("turretPosition", turretMotors[0].getPosition());
 				if(turretMotors[0].getPosition() > targetPosition - 0.1 && turretMotors[0].getPosition() < targetPosition + 0.1){
@@ -401,7 +400,7 @@ public class Shooter extends Subsystems{
 			
 			}
 	    	}else{
-	    		System.out.println("FindCCWLimit - Turret Timer Running");
+	    		System.out.println("FindREVLimit - Turret Timer Running");
 	    	}
 	    	
 	        }
@@ -424,10 +423,10 @@ public class Shooter extends Subsystems{
     	
 
 	    public void run() {
-			targetPosition =   (Constants.CCWLimit +(turnDegrees/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
+			targetPosition =   (Constants.REVLimit +(turnDegrees/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
 	    	System.out.println("targetPosition: " + targetPosition + ", current: " + turretMotors[0].getPosition());
 	    	
-			if (CCWLimitFound){
+			if (REVLimitFound){
 		    	SmartDashboard.putNumber("targetPosition", targetPosition);
 		    	SmartDashboard.putNumber("turretPosition", turretMotors[0].getPosition());
 				if(turretMotors[0].getPosition() > targetPosition - 0.1 && turretMotors[0].getPosition() < targetPosition + 0.1){
@@ -445,7 +444,7 @@ public class Shooter extends Subsystems{
 		    	if(ccw_limit){
 		    		turn = (turnRPM < 0);	
 		    		autoTurretDirection = -1;
-		    		Constants.CCWLimit = turretMotors[0].getEncPosition();
+		    		Constants.REVLimit = turretMotors[0].getEncPosition();
 		    	}else if (cw_limit){
 		    		turn = (turnRPM > 0);		
 		    		Constants.CWLimit = turretMotors[0].getEncPosition();
@@ -469,8 +468,8 @@ public class Shooter extends Subsystems{
 		if(centeringTurret !=null){
 		centeringTurret.cancel();
 		}
-		if(CCWLimitTimer !=null){
-		CCWLimitTimer.cancel();
+		if(REVLimitTimer !=null){
+		REVLimitTimer.cancel();
 		}
 		if(turningTurretTimer !=null){
 		turningTurretTimer.cancel();
@@ -511,13 +510,13 @@ public class Shooter extends Subsystems{
 				turnTicks = turnRadians * encTicksPerRad;
 				turnPos = turretMotors[0].getEncPosition() +turnTicks;
 				
-				if(turnPos < Constants.CCWLimit){
+				if(turnPos < Constants.REVLimit){
 					turnRadians = 2*Math.PI + turnPos;
 				}else if (turnPos > Constants.CWLimit){
 					turnRadians = turnPos-2*Math.PI;
 				}
 				
-				if(turnPos < Constants.CCWLimit || turnPos > Constants.CWLimit){
+				if(turnPos < Constants.REVLimit || turnPos > Constants.CWLimit){
 					StopTurret();
 				}else{
 					//turretMotors[0].set((turnPos-indexerMotors[0].getEncPosition())/4096);
