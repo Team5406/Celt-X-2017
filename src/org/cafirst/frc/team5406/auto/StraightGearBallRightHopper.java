@@ -7,7 +7,7 @@ import org.cafirst.frc.team5406.subsystems.Shooter;
 
 
 
-public class StraightGearBallRightHopperBack  extends AutonomousRoutine{
+public class StraightGearBallRightHopper  extends AutonomousRoutine{
 	private Intake robotIntake;
 	private Shooter robotShooter;
 	private Drive robotDrive;
@@ -20,8 +20,8 @@ public class StraightGearBallRightHopperBack  extends AutonomousRoutine{
 	
 
 
-	public StraightGearBallRightHopperBack(Drive _robotDrive, Intake _robotIntake, Shooter _robotShooter){
-		super("9 - Middle Gear and Right Balls");
+	public StraightGearBallRightHopper(Drive _robotDrive, Intake _robotIntake, Shooter _robotShooter){
+		super("11 - Middle Gear and Right Balls");
 		robotDrive = _robotDrive;
 		robotIntake = _robotIntake;
 		robotShooter = _robotShooter;

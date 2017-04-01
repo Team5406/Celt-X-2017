@@ -7,7 +7,7 @@ import org.cafirst.frc.team5406.subsystems.Shooter;
 
 
 
-public class BallAuto_RightHopperNoMP  extends AutonomousRoutine{
+public class BallAuto_RightHopper  extends AutonomousRoutine{
 	private Intake robotIntake;
 	private Shooter robotShooter;
 	private Drive robotDrive;
@@ -20,7 +20,7 @@ public class BallAuto_RightHopperNoMP  extends AutonomousRoutine{
 	
 
 
-	public BallAuto_RightHopperNoMP(Drive _robotDrive, Intake _robotIntake, Shooter _robotShooter){
+	public BallAuto_RightHopper(Drive _robotDrive, Intake _robotIntake, Shooter _robotShooter){
 		super("3 - Balls Only - Right Hopper");
 		robotDrive = _robotDrive;
 		robotIntake = _robotIntake;

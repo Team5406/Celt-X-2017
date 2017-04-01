@@ -87,8 +87,6 @@ public class Shooter extends Subsystems{
 		//Starts and runs thread
 		thread.start();
 		
-		SmartDashboard.putBoolean("CCW Limit", false);
-		SmartDashboard.putBoolean("CW Limit", false);
 	}
 	
 	public void getLimitSwitches(){

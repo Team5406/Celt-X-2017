@@ -7,7 +7,7 @@ import org.cafirst.frc.team5406.auto.AutonomousRoutine;
 
 
 
-public class AutoRightGear  extends AutonomousRoutine{
+public class AutoLeftGearLeftBoiler  extends AutonomousRoutine{
 	private Intake robotIntake;
 	private Drive robotDrive;
 	private int autoStep = 0;
@@ -16,8 +16,8 @@ public class AutoRightGear  extends AutonomousRoutine{
 	private int direction = 1;
 	
 
-	public AutoRightGear(Drive _robotDrive, Intake _robotIntake){
-		super("7 - Right Gear (Left Hopper Side)");
+	public AutoLeftGearLeftBoiler(Drive _robotDrive, Intake _robotIntake){
+		super("6 - Left Gear (Left Boiler)");
 		robotDrive = _robotDrive;
 		robotIntake = _robotIntake;
 	}
@@ -42,30 +42,30 @@ public class AutoRightGear  extends AutonomousRoutine{
 		switch (autoStep){
 		case 0:
 			robotPosition = robotDrive.getPosition();
-			System.out.println("robotPosition (0) " + direction*robotPosition[1]);
-			if( direction*robotPosition[1] > ((150-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			System.out.println("robotPosition (0) " + direction*robotPosition[0]);
+			if( direction*robotPosition[0] > ((155-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 1;
 				robotIntake.dropGear(false);
 				robotDrive.resetPosition();
-				robotDrive.driveAtAngleUpdate(0.0, -60.0, true);
-			} else if( direction*robotPosition[1] > ((130-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAtAngleUpdate(110, -60, true);
-			}else if ( direction*robotPosition[1] > ((100-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAtAngleUpdate(300, -60, true);
+				robotDrive.driveAtAngleUpdate(0.0, 60.0, true);
+			} else if( direction*robotPosition[0] > ((135-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(115, 60, true);
+			}else if ( direction*robotPosition[0] > ((95-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(300, 60, true);
 			}
 			break;
 			
 		case 1:
 			if (!gearDelay){
 				gearDelay = true;
-				robotDrive.driveAtAngleUpdate(0.0, -60.0, false);
+				robotDrive.driveAtAngleUpdate(0.0, 60.0, false);
 		    	new java.util.Timer().schedule( 
 		    			new java.util.TimerTask() {
 		    	            @Override
 		    	            public void run() {
 		    	            	autoStep = 2;
 		    	            	robotDrive.resetPosition();
-		    	            	robotDrive.driveAtAngleUpdate(-200, -60.0, false);
+		    	            	robotDrive.driveAtAngleUpdate(-200, 60.0, false);
 		    	            	this.cancel();
 		    	            }
 		    	        }, 
@@ -75,9 +75,9 @@ public class AutoRightGear  extends AutonomousRoutine{
 			break;
 		case 2:
 			robotPosition = robotDrive.getPosition();
-			robotDrive.driveAtAngleUpdate(-200, -60.0, false);
-			System.out.println("robotPosition (2) " + direction*robotPosition[1]);
-			if(direction*robotPosition[1] < (-24/(Constants.WHEEL_DIAM*Math.PI))){
+			robotDrive.driveAtAngleUpdate(-200, 60.0, false);
+			System.out.println("robotPosition (2) " + direction*robotPosition[0]);
+			if(direction*robotPosition[0] < (-24/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 3;
 				robotIntake.liftGear();
 				robotIntake.StopIntake();

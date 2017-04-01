@@ -84,15 +84,21 @@ public class Robot extends IterativeRobot {
     	
     	autonomousSelector.addDefault("0 - Do Nothing", new DoNothing());
     	autonomousSelector.addObject("1 - Middle Gear", new AutoStraightGear(robotDrive, robotIntake));
-    	autonomousSelector.addObject("2 - Balls Only - Left Hopper", new BallAuto_LeftHopperNoMP(robotDrive, robotIntake, robotShooter));
-    	autonomousSelector.addObject("3 - Balls Only - Right Hopper", new BallAuto_RightHopperNoMP(robotDrive, robotIntake, robotShooter));
-    	//autonomousSelector.addObject("6 - Left Gear", new AutoLeftGear(robotDrive, robotIntake));
-    	//autonomousSelector.addObject("7 - Right Gear", new AutoRightGear(robotDrive, robotIntake));
-    	autonomousSelector.addObject("8 - Drive Straight", new AutoStraightOnly(robotDrive));
-     	autonomousSelector.addObject("9 - Middle Gear and Right Balls", new StraightGearBallRightHopperBack(robotDrive, robotIntake, robotShooter));
-    	autonomousSelector.addObject("10 - Middle Gear and Left Balls", new StraightGearBallLeftHopperBack(robotDrive, robotIntake, robotShooter));
-    	//autonomousSelector.addObject("Gear and Balls - Right Hopper", new GearBallRightHopper(robotDrive, robotIntake, robotShooter));
+    	autonomousSelector.addObject("2 - Balls Only - Left Hopper", new BallAuto_LeftHopper(robotDrive, robotIntake, robotShooter));
+    	autonomousSelector.addObject("3 - Balls Only - Right Hopper", new BallAuto_RightHopper(robotDrive, robotIntake, robotShooter));
+    	autonomousSelector.addObject("4 - Left Gear and Left Hopper", new GearBallLeftHopper(robotDrive, robotIntake, robotShooter));
+    	autonomousSelector.addObject("5 - Right Gear and Right Hopper", new GearBallRightHopper(robotDrive, robotIntake, robotShooter));
+    	autonomousSelector.addObject("6 - Left Gear (Left Boiler)", new AutoLeftGearLeftBoiler(robotDrive, robotIntake));
+    	autonomousSelector.addObject("7 - Right Gear (Left Boiler)", new AutoRightGearLeftBoiler(robotDrive, robotIntake));
+    	autonomousSelector.addObject("8 - Left Gear (Right Boiler)", new AutoLeftGearRightBoiler(robotDrive, robotIntake));
+    	autonomousSelector.addObject("9 - Right Gear (Right Boiler)", new AutoRightGearRightBoiler(robotDrive, robotIntake));
+    	autonomousSelector.addObject("10 - Drive Straight", new AutoStraightOnly(robotDrive));
+     	autonomousSelector.addObject("11 - Middle Gear and Right Balls", new StraightGearBallRightHopper(robotDrive, robotIntake, robotShooter));
+    	autonomousSelector.addObject("12 - Middle Gear and Left Balls", new StraightGearBallLeftHopper(robotDrive, robotIntake, robotShooter));
 
+
+    	
+    	
     	calibrator = new Calibration(robotDrive, robotIntake, robotShooter);
     	SmartDashboard.putData("Autonomous", autonomousSelector);
 
