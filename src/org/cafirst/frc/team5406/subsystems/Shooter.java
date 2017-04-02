@@ -52,7 +52,7 @@ public class Shooter extends Subsystems{
 	private int degreeTurnFinished = 0; //-1 = error; 0 = in progress; 1 = done
 	private boolean degreeTurnInProgress = false;
 	private int turretTimerRunning = 0;
-
+	private double targetPosition;
 
 
 	public Shooter(){
@@ -74,7 +74,17 @@ public class Shooter extends Subsystems{
 		turretMotors[0].setCurrentLimit(10);
 		turretMotors[0].EnableCurrentLimit(true);
 		turretMotors[0].enableLimitSwitch(true, true);
+		turretMotors[0].enableZeroSensorPositionOnForwardLimit(true);
 		turretMotors[0].setAllowableClosedLoopErr(10);
+		turretMotors[0].configPeakOutputVoltage(+5.0f, -5.0f);
+		turretMotors[0].enableForwardSoftLimit(false);
+		turretMotors[0].enableReverseSoftLimit(false);
+		
+
+
+
+
+
 		
 		time_offset = System.nanoTime();
 		
@@ -99,6 +109,9 @@ public class Shooter extends Subsystems{
 		shooterMotors[0].enable();
 		Shoot(getRPM());
 	}
+	
+	
+
 	
 	public double getRPM(){
 		double rpm;
@@ -157,22 +170,32 @@ public class Shooter extends Subsystems{
 	
 	
 	public boolean moveTurret(double amount){
+		turretMotors[0].changeControlMode(TalonControlMode.Position);
 		boolean turn = true;
 		boolean rev_limit = turretMotors[0].isRevLimitSwitchClosed();
 		boolean fwd_limit = turretMotors[0].isFwdLimitSwitchClosed();
 		//clockwise is negative ticks; 29422 ticks for full motion
-		if(rev_limit){
+		//clockwise hits reverse limit switch; counterclockwise hits forward limit switch
+		if(fwd_limit){
 			turn = (amount < 0);	
     		resetTurret();
     		autoTurretDirection = -1;
-    		Constants.REVLimit = turretMotors[0].getEncPosition();
-		}else if (fwd_limit){
+    		Constants.FWDLimit = turretMotors[0].getEncPosition();
+    		//turretMotors[0].setForwardSoftLimit(-0.1);
+    		//turretMotors[0].enableForwardSoftLimit(true);
+    		//turretMotors[0].setReverseSoftLimit((-1*Constants.TURRET_ROTATION_TICKS/4096)+0.5);
+    		//turretMotors[0].enableReverseSoftLimit(true);
+		}else if (rev_limit){
 			turn = (amount > 0);		
-			Constants.FWDLimit = turretMotors[0].getEncPosition();
+			Constants.REVLimit = turretMotors[0].getEncPosition();
     		autoTurretDirection = 1;
 		}
+		
+		System.out.println("Turn: " + turn + "Turn Amount: " + amount + "FWDLimit: " + Constants.FWDLimit + ", REVLimit: " + Constants.REVLimit + "Current: " + turretMotors[0].getEncPosition());
+		
 		if(turn){
 			turretPosition = turretMotors[0].getPosition()+amount;
+			System.out.println("setPosition: " + turretPosition);
 			turretMotors[0].set(turretPosition);
 		}
 		return rev_limit || fwd_limit;
@@ -212,8 +235,8 @@ public class Shooter extends Subsystems{
 		turnTicks = ticks/5;
 	}
 	
-	if(Math.abs(turnTicks) > 0.15){
-		turnTicks = Math.signum(turnTicks)*0.15;
+	if(Math.abs(turnTicks) > 0.3){
+		turnTicks = Math.signum(turnTicks)*0.3;
 	}
 	
 	SmartDashboard.putNumber("turnTicks", turnTicks);
@@ -233,6 +256,7 @@ public class Shooter extends Subsystems{
 	}
 	
 	public int turnTurretToDegree(double _degree){
+		System.out.println("degreeTurnInProgress" + degreeTurnInProgress);
 		if(!degreeTurnInProgress){
 		turningTurretTimer	= new Timer();
 		turningTurretTimer.schedule(new turnToDegree(_degree), 0L, 2L); //time in milliseconds
@@ -243,6 +267,8 @@ public class Shooter extends Subsystems{
 	
 	
 	public boolean findTurretREVLimit(){
+		System.out.println("REVLimitSearching : " + REVLimitSearching);
+		System.out.println("REVLimitFound : " + REVLimitFound);
 		if(!REVLimitSearching){
 		REVLimitTimer	 = new Timer();
 		REVLimitTimer.schedule(new findREVLimit(), 0L, 2L); //time in milliseconds
@@ -299,7 +325,7 @@ public class Shooter extends Subsystems{
     		
     		
     	}else{
-    		turnTicks = autoTurretDirection *0.03;
+    		turnTicks = autoTurretDirection *0.2;
     	}
     	
     	if(Math.abs(turnTicks) > 0.15){
@@ -343,14 +369,12 @@ public class Shooter extends Subsystems{
 			if (!REVLimitFound){
 				 turnTicks = 0.1;
 			}
-	    	SmartDashboard.putNumber("turretPosition", turretMotors[0].getPosition());
-	    	SmartDashboard.putBoolean("REVLimitFound", REVLimitFound);
-	    	SmartDashboard.putNumber("REVLimit", Constants.REVLimit);
+	    	System.out.println("turretPosition" + turretMotors[0].getPosition() + "REVLimit" + Constants.REVLimit);
 	    	moveTurret(turnTicks);
 
-	    	if(Constants.REVLimit !=0){
+	    	if(Constants.FWDLimit < Integer.MAX_VALUE){
 	    		resetTurret();
-	    		Constants.REVLimit = turretMotors[0].getEncPosition();
+	    		Constants.FWDLimit = turretMotors[0].getEncPosition();
 	    		turretTimerRunning = 0;
 	    		REVLimitFound = true;
 	    		REVLimitTimer.cancel();
@@ -375,25 +399,34 @@ public class Shooter extends Subsystems{
     	
 
 	    public void run() {
+			System.out.println("turretTimerRunning" + turretTimerRunning);
+			
 	    	if(turretTimerRunning ==0||turretTimerRunning ==3){
-			targetPosition =   (Constants.REVLimit +(turnDegrees/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
+	    		turretTimerRunning = 3;
+			targetPosition =   (Constants.FWDLimit +(turnDegrees/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
 	    	System.out.println("targetPosition: " + targetPosition + ", current: " + turretMotors[0].getPosition());
 	    	
 			if (REVLimitFound){
 		    	SmartDashboard.putNumber("targetPosition", targetPosition);
 		    	SmartDashboard.putNumber("turretPosition", turretMotors[0].getPosition());
 				if(turretMotors[0].getPosition() > targetPosition - 0.1 && turretMotors[0].getPosition() < targetPosition + 0.1){
+			    	System.out.println("Cancelling Timer 1");
 					degreeTurnFinished = 1;
+					turretTimerRunning = 0;
 		    		turningTurretTimer.cancel();
 		    		turningTurretTimer.purge();
 				}else{
 				turnTicks = -0.1;
 		    	//clockwise is negative ticks; 29422 ticks for full motion
-		    	if(moveTurret(turnTicks)){
+		    	if(turretMotors[0].isRevLimitSwitchClosed()){
+			    	System.out.println("Cancelling Timer 2");
 		    		degreeTurnFinished = -1;
+		    		turretTimerRunning = 0;
 		    		turningTurretTimer.cancel();
 		    		turningTurretTimer.purge();
 		    	}
+		    	
+		    	moveTurret(turnTicks);
 				}
 			
 			}

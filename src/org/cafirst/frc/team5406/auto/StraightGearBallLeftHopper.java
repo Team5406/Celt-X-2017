@@ -97,7 +97,7 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 			robotPosition = robotDrive.getPosition();
 			robotDrive.driveAtAngleUpdate(-300, 0.0, false);
 			System.out.println("robotPosition (2) " + direction*robotPosition[1]);
-			if(direction*robotPosition[1] < (-16/(Constants.WHEEL_DIAM*Math.PI))){
+			if(direction*robotPosition[1] < (-12/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 3;
             	robotDrive.resetPosition();
 				robotIntake.liftGear();
@@ -108,10 +108,11 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 		case 3:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (3) " + direction*robotPosition[0]);
-			if( Math.abs(direction*robotPosition[0]) > (84/(Constants.WHEEL_DIAM*Math.PI))){
+			if( Math.abs(direction*robotPosition[0]) > (108/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(0.0, 90.0, true);
+				robotIntake.IntakeBalls(50);
 				autoStep = 4;
-			} else if( Math.abs(direction*robotPosition[0]) <= (84/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( Math.abs(direction*robotPosition[0]) <= (108/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(-300, 90.0, true);
 			}
 			break;

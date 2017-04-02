@@ -43,14 +43,14 @@ public class AutoLeftGearLeftBoiler  extends AutonomousRoutine{
 		case 0:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (0) " + direction*robotPosition[0]);
-			if( direction*robotPosition[0] > ((155-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( direction*robotPosition[0] > ((160-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 1;
 				robotIntake.dropGear(false);
 				robotDrive.resetPosition();
 				robotDrive.driveAtAngleUpdate(0.0, 60.0, true);
 			} else if( direction*robotPosition[0] > ((135-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(115, 60, true);
-			}else if ( direction*robotPosition[0] > ((95-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			}else if ( direction*robotPosition[0] > ((90-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(300, 60, true);
 			}
 			break;

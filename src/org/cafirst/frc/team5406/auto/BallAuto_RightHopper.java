@@ -64,13 +64,14 @@ public class BallAuto_RightHopper  extends AutonomousRoutine{
 		case 0:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (0) " + direction*robotPosition[0]);
-			if( direction*robotPosition[0] > ((184-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( direction*robotPosition[0] > ((115-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(0.0, 90.0, true);
 				autoStep = 1;
-			} else if( direction*robotPosition[0] > ((124-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( direction*robotPosition[0] > ((95-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(400, 90.0, true);
-			}else if ( direction*robotPosition[0] > ((86-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			}else if ( direction*robotPosition[0] > ((77-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(400, 45.0, true);
+				robotIntake.IntakeBalls(50);
 			}
 			break;
 		case 1:

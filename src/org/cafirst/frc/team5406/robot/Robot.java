@@ -270,7 +270,7 @@ public class Robot extends IterativeRobot {
 
 		//Y-Button: Shoot Close
 		if(operatorGamepad.getButtonHeld(XboxController.Y_BUTTON)){
-robotShooter.turnTurretToDegree(-40);
+			robotShooter.turnTurretToDegree(-110);
         }
 		
 		//A-Button: Find CCWLimit
@@ -364,6 +364,7 @@ robotShooter.turnTurretToDegree(-40);
 	public void disabledInit() {
 		selectedRoutine.end();
 		robotDrive.driveAtAngleEnd();
+		robotShooter.stopTimer();
 	}
 	
 	@Override

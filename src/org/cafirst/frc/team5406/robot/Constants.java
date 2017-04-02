@@ -14,12 +14,12 @@ public final class Constants {
 	
 	//centerX is not a constant - it will be changed dynamically
 	public static double centerX = 0;
-	public static int REVLimit = 0;
-	public static int FWDLimit = 0;
+	public static int REVLimit = Integer.MIN_VALUE;
+	public static int FWDLimit = Integer.MAX_VALUE;
 	
 	public static int PRACTICE_BOT_LEFT_HOPPER_TURRET_START = -270; //degrees
 	public static int COMP_BOT_LEFT_HOPPER_TURRET_START = -220; //degrees
-	public static int PRACTICE_BOT_RIGHT_HOPPER_TURRET_START = -110; //degrees
+	public static int PRACTICE_BOT_RIGHT_HOPPER_TURRET_START = -70; //degrees
 	public static int COMP_BOT_RIGHT_HOPPER_TURRET_START = -70; //degrees
 	
 	//drive constants - units in inches
@@ -234,9 +234,9 @@ public final class Constants {
 		TURRET.reverse_encoder = false; //reverse_encoder
 		TURRET.invert = false;
 		TURRET.PID_F=0; //PID_F
-		TURRET.PID_P=0.8; //PID_P
-		TURRET.PID_I=0.007; //PID_I
-		TURRET.PID_D=0.9; //PID_D
+		TURRET.PID_P=0.7; //PID_P
+		TURRET.PID_I=0.0; //PID_I
+		TURRET.PID_D=0.4; //PID_D
 		TURRET.motors= new Motor[] {
 				new Motor(12, MASTER, 0),
 		};

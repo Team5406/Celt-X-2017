@@ -65,14 +65,15 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 		case 0:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (0) " + direction*robotPosition[1]);
-			if( direction*robotPosition[1] > ((157-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( direction*robotPosition[1] > ((115-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(0.0, -90.0, true);
             	robotDrive.resetPosition();
 				autoStep = 1;
-			} else if( direction*robotPosition[1] > ((120-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( direction*robotPosition[1] > ((95-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(400, -90.0, true);
-			}else if ( direction*robotPosition[1] > ((80-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			}else if ( direction*robotPosition[1] > ((74-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(400, -45.0, true);
+				robotIntake.IntakeBalls(50);
 			}
 			break;
 		case 1:
@@ -84,7 +85,7 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 		    	            public void run() {
 		    	            	autoStep = 2;
 		    	            	robotDrive.resetPosition();
-		    					robotDrive.driveAtAngleUpdate(-110, 0.0, true);
+		    					//robotDrive.driveAtAngleUpdate(-110, 0.0, true);
 		    					this.cancel();
 		    	            }
 		    	        }, 
@@ -103,10 +104,11 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 			System.out.println(System.nanoTime() + " Robot Position" + direction*robotPosition[1]);
 
 	
-			if( Math.abs(direction*robotPosition[1]) < (50/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAtAngleUpdate(-110, 0.0, true);
+			/*//Drive backward and straighten to compensate for turret angle
+			 * if( Math.abs(direction*robotPosition[1]) < (12/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(-400, 0.0, true);
 				System.out.println(System.nanoTime() + " Drive at Angle");
-			}else{
+			}else{*/
 			robotDrive.driveAtAngleUpdate(0, 0.0, true);
 			robotDrive.driveAtAngleEnd();
 			System.out.println(System.nanoTime() + " Drive at Angle End");
@@ -127,7 +129,7 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 				robotShooter.Shoot();
 				robotShooter.Indexer(865);				
 			}
-			}
+			//}
 			break;
 		
 		}

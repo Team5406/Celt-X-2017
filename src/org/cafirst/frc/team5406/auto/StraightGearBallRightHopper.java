@@ -96,21 +96,21 @@ public class StraightGearBallRightHopper  extends AutonomousRoutine{
 			robotPosition = robotDrive.getPosition();
 			robotDrive.driveAtAngleUpdate(-300, 0.0, false);
 			System.out.println("robotPosition (2) " + direction*robotPosition[1]);
-			if(direction*robotPosition[1] < (-24/(Constants.WHEEL_DIAM*Math.PI))){
+			if(direction*robotPosition[1] < (-12/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 3;
             	robotDrive.resetPosition();
 				robotIntake.liftGear();
 				robotIntake.StopIntake();
-				robotDrive.enableBrake(false);
 			}
 			break;
 		case 3:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (3) " + direction*robotPosition[1]);
-			if( Math.abs(direction*robotPosition[1]) > (84/(Constants.WHEEL_DIAM*Math.PI))){
+			if( Math.abs(direction*robotPosition[1]) > (108/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(0.0, -90, true);
+				robotIntake.IntakeBalls(50);
 				autoStep = 4;
-			} else if( Math.abs(direction*robotPosition[1]) <= (84/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( Math.abs(direction*robotPosition[1]) <= (108/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(-300, -90, true);
 			}
 			break;

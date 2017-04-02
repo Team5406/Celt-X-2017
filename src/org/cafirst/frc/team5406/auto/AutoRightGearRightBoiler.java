@@ -34,6 +34,7 @@ public class AutoRightGearRightBoiler  extends AutonomousRoutine{
 	
 	public void end(){
 		robotDrive.driveAtAngleEnd();
+		robotDrive.enableBrake(false);
 	}
 
 	public void periodic(){
@@ -43,14 +44,14 @@ public class AutoRightGearRightBoiler  extends AutonomousRoutine{
 		case 0:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (0) " + direction*robotPosition[1]);
-			if( direction*robotPosition[1] > ((150-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( direction*robotPosition[1] > ((157-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 1;
 				robotIntake.dropGear(false);
 				robotDrive.resetPosition();
 				robotDrive.driveAtAngleUpdate(0.0, -60.0, true);
 			} else if( direction*robotPosition[1] > ((130-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(110, -60, true);
-			}else if ( direction*robotPosition[1] > ((100-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			}else if ( direction*robotPosition[1] > ((83-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(300, -60, true);
 			}
 			break;
