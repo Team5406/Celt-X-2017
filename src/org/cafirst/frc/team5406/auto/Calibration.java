@@ -30,6 +30,7 @@ public class Calibration{
 	private boolean init = false;
 	private boolean inProgress = false;
 	private boolean newDrive = true;
+	private double turretTarget = 0;
 	
 	
 	
@@ -40,6 +41,7 @@ public class Calibration{
 		dataSet = new StringBuilder();
 		String ColumnNamesList = "encoder,imageY,CenterX,RPM";
 		dataSet.append(ColumnNamesList +"\n");
+		turretTarget = robotShooter.turretPosition();
 	}
 	
 	/*Drive straight in increments of 6". Record encoder value, topRight.y, centerX, distance, RPM*/
@@ -88,6 +90,7 @@ public class Calibration{
 		}else{
 			robotShooter.getDistance();
 			RPM = robotShooter.getRPM();
+			turretTarget = robotShooter.turretPosition();
 		}
 	}
 	
@@ -96,7 +99,8 @@ public class Calibration{
 	}
 	
 	public void adjustTurret(double amount){
-		robotShooter.turnTurret(amount, false);
+		turretTarget += (amount/4096);
+		robotShooter.moveTurret(turretTarget - robotShooter.turretPosition());
 	}
 	
 	public void saveFile(){

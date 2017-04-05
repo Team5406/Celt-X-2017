@@ -53,6 +53,7 @@ public class Robot extends IterativeRobot {
 	private boolean gearDropHeld = true;
 	private boolean driveBack = false;
 	private boolean autoDone = false;
+	private boolean magicTurret = false;
 	private int autoCounter = 0;
     public static DigitalInput practiceBot = new DigitalInput(Constants.PRACTICE_BOT);
 
@@ -60,7 +61,7 @@ public class Robot extends IterativeRobot {
 	private SendableChooser<Object> autonomousSelector = new SendableChooser<>();
 	double turretInit = 0;
 	
-	private final boolean CALIBRATION_MODE = false;
+	private final boolean CALIBRATION_MODE = true;
 	private Calibration calibrator;
 
 
@@ -135,6 +136,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		robotShooter.getLimitSwitches();
+		robotShooter.displayTurretPos();
 		
 		if(CALIBRATION_MODE){
 			//STEP 1: Drive Forward
@@ -164,10 +166,10 @@ public class Robot extends IterativeRobot {
 			//STEP 5: Adjust
 			switch(operatorGamepad.getDirectionPad()){
 			case UP:
-				calibrator.changeRPM(10);
+				calibrator.changeRPM(5);
 				break;
 			case DOWN:
-				calibrator.changeRPM(-10);
+				calibrator.changeRPM(-5);
 				break;
 			case LEFT:
 				calibrator.adjustTurret(-10);
@@ -269,13 +271,11 @@ public class Robot extends IterativeRobot {
 		
 
 		//Y-Button: Shoot Close
-		if(operatorGamepad.getButtonHeld(XboxController.Y_BUTTON)){
-			robotShooter.turnTurretToDegree(-110);
-        }
+		
 		
 		//A-Button: Find CCWLimit
 		if(operatorGamepad.getButtonHeld(XboxController.A_BUTTON)){
-			robotShooter.findTurretREVLimit();
+			magicTurret = false;
         }
 		//X-Button: Find Turret
 		if(operatorGamepad.getButtonHeld(XboxController.X_BUTTON)){
@@ -287,7 +287,11 @@ public class Robot extends IterativeRobot {
 		if(util.applyDeadband(operatorGamepad.getRightTrigger())!=0){
 			if(!button_pressed){
 				robotShooter.Shoot(Math.abs(operatorGamepad.getRightTrigger())*5700);
-				robotShooter.BallPump(-1);
+				if(operatorGamepad.getButtonHeld(XboxController.Y_BUTTON)){
+					robotShooter.BallPump(1);
+					}else{
+						robotShooter.BallPump(-1);
+					}
 		    	//robotIntake.IntakeBalls(0.75);
 		    	button_pressed = true;
 			}
@@ -298,6 +302,11 @@ public class Robot extends IterativeRobot {
 			robotShooter.StopBallPump();
 		}
 		
+		if(operatorGamepad.getButtonHeld(XboxController.Y_BUTTON)){
+			if(!operatorGamepad.getRightTriggerPressed()){
+			robotShooter.BallPump(1);
+			}
+        }
 
 		
 		//B-Button: Shoot - run indexer to feed balls into shooter wheels.
@@ -332,6 +341,7 @@ public class Robot extends IterativeRobot {
 			if(operatorGamepad.getButtonHeld(XboxController.LEFT_STICK)){
 				modifier = 0.35;
 			}
+			magicTurret = false;
 			robotShooter.turnTurret(modifier*util.applyDeadband(operatorGamepad.getLeftX(), 0.2), false);
 			//robotShooter.turnTurret(modifier*util.applyDeadband(operatorGamepad.getRightX(), 0.1));
         }else{
@@ -344,10 +354,30 @@ public class Robot extends IterativeRobot {
 			if(operatorGamepad.getButtonHeld(XboxController.LEFT_STICK)){
 				modifier = 0.35;
 			}
+			magicTurret = false;
 			robotShooter.turnTurret(modifier*util.applyDeadband(operatorGamepad.getRightX(), 0.2), true);
+			robotShooter.stopTimer();
         }else{
 			robotShooter.StopTurret();
         }
+		
+		
+		switch(operatorGamepad.getDirectionPad()){
+		case UP:
+			robotShooter.adjustRPM(10);
+			break;
+		case DOWN:
+			robotShooter.adjustRPM(-10);
+			break;
+		case LEFT:
+			robotShooter.adjustTurret(10);
+			break;
+		case RIGHT:
+			robotShooter.adjustTurret(-10);
+			break;
+		}
+		
+		
 		
 		}
         

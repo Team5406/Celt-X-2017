@@ -51,11 +51,8 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 		System.out.println("Auto Step (Straight Gear): " + autoStep);
 		double turretInit = 0;
 		if (robotShooter.findTurretREVLimit() && turretInit == 0){
-			if(Constants.IS_PRACTICE_BOT){
-				turretInit = robotShooter.turnTurretToDegree(Constants.PRACTICE_BOT_LEFT_HOPPER_TURRET_START);
-			}else{
-				turretInit = robotShooter.turnTurretToDegree(Constants.COMP_BOT_LEFT_HOPPER_TURRET_START);
-			}
+			turretInit = robotShooter.turnTurretToDegree(-270);
+
 		}
 		
 		
@@ -116,7 +113,7 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 				robotShooter.alignTurret();
 				System.out.println(System.nanoTime() + " Aligning Turret");
 				turretAligned = true;
-			}else if (!robotShooter.centeringInProgress && !readyToShoot){
+			}else if (!robotShooter.centeringInProgress && !readyToShoot && turretAligned){
 				robotShooter.getDistance();
 				System.out.println(System.nanoTime() + " Getting Distance");
 

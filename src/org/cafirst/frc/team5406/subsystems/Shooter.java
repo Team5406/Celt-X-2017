@@ -53,6 +53,9 @@ public class Shooter extends Subsystems{
 	private boolean degreeTurnInProgress = false;
 	private int turretTimerRunning = 0;
 	private double targetPosition;
+	private double shooterRPMOffset = 0;
+	private double turretTarget = 0;
+
 
 
 	public Shooter(){
@@ -75,14 +78,20 @@ public class Shooter extends Subsystems{
 		turretMotors[0].EnableCurrentLimit(true);
 		turretMotors[0].enableLimitSwitch(true, true);
 		turretMotors[0].enableZeroSensorPositionOnForwardLimit(true);
-		turretMotors[0].setAllowableClosedLoopErr(10);
-		turretMotors[0].configPeakOutputVoltage(+5.0f, -5.0f);
+		turretMotors[0].setAllowableClosedLoopErr(7);
+		turretMotors[0].configPeakOutputVoltage(+6.0f, -6.0f);
 		turretMotors[0].enableForwardSoftLimit(false);
 		turretMotors[0].enableReverseSoftLimit(false);
 		
 
-
-
+		turretMotors[0].setMotionMagicCruiseVelocity(1000);
+		turretMotors[0].setMotionMagicAcceleration(1000);
+		turretMotors[0].setProfile(1);
+		turretMotors[0].setP(0.5);
+		turretMotors[0].setI(0);
+		turretMotors[0].setD(0.3);
+		turretMotors[0].setF(0.3);
+		turretMotors[0].setProfile(0);
 
 
 		
@@ -99,6 +108,15 @@ public class Shooter extends Subsystems{
 		
 	}
 	
+	public void setTurretPID(double position){
+		double amount = Math.abs(turretMotors[0].getPosition() - position);
+		/*if (amount > 0.1){
+			turretMotors[0].setProfile(1);
+		}else{*/
+			turretMotors[0].setProfile(0);
+		//}
+	}
+	
 	public void getLimitSwitches(){
 		SmartDashboard.putBoolean("FWD Limit", turretMotors[0].isFwdLimitSwitchClosed());
 		SmartDashboard.putBoolean("REV Limit", turretMotors[0].isRevLimitSwitchClosed());
@@ -110,7 +128,52 @@ public class Shooter extends Subsystems{
 		Shoot(getRPM());
 	}
 	
+	public void adjustRPM(double amount){
+		shooterRPMOffset += amount;
+	}
 	
+	public void adjustTurret(double amount){
+		System.out.println("turretTarget: " + turretTarget);
+		if(turretTarget ==0){
+			turretTarget = turretPosition();
+		}
+		turretTarget += (amount/4096);
+		moveTurret(turretTarget - turretPosition());
+	}
+	
+	/*public void turretMagic(){
+		getDistance();
+		
+		if(listener.getFrameCount() !=lastFrame){
+			double center = (Constants.IMAGE_WIDTH/2)-60-Constants.IMAGE_WIDTH*((Math.tan(Constants.CAMERA_OFFSET/(distance*12)))*(180/Math.PI)/Constants.AXIS_FOV);
+			System.out.println("Center" + center);
+	 		double centerOffset = center-Constants.centerX;
+			System.out.println("Constants.centerX" + Constants.centerX);
+			System.out.println("CenterOffset" + centerOffset);
+			double degreeOffset = Constants.AXIS_FOV*(centerOffset/Constants.IMAGE_WIDTH);
+			System.out.println("DegreeOffset" + degreeOffset);
+	    	double turnTicks = (((degreeOffset)/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
+			System.out.println("turnTicks" + turnTicks);
+			System.out.println("Position" + turretMotors[0].getPosition());
+			double turretSet = turretMotors[0].getPosition()+turnTicks;
+			turretMotors[0].set(turretSet);
+		}
+	}*/
+	
+	public void displayTurretPos(){
+		getDistance();
+ 		double center = (Constants.IMAGE_WIDTH/2)+60-Constants.IMAGE_WIDTH*((Math.tan(Constants.CAMERA_OFFSET/(distance*12)))*(180/Math.PI)/Constants.AXIS_FOV);
+ 		double centerOffset = center-Constants.centerX;
+		double degreeOffset = Constants.AXIS_FOV*(centerOffset/Constants.IMAGE_WIDTH);
+    	double turnTicks = ((degreeOffset/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
+		double turretSet = turretMotors[0].getPosition()+turnTicks;
+		SmartDashboard.putNumber("Center", center);
+		SmartDashboard.putNumber("TurretPos", turretMotors[0].getPosition());
+		SmartDashboard.putNumber("centerOffset", centerOffset);
+		SmartDashboard.putNumber("degreeOffset", degreeOffset);
+		SmartDashboard.putNumber("turnTicks", turnTicks);
+		SmartDashboard.putNumber("ClosedLoopErr", turretMotors[0].getClosedLoopError());
+	}
 
 	
 	public double getRPM(){
@@ -128,13 +191,14 @@ public class Shooter extends Subsystems{
 			//rpm = 61.49*distance*distance-561.5*distance+6419;
 			rpm = 0.1002*topRight.y*topRight.y-40.57*topRight.y+9003;
 		}
+		
 		return rpm;
 	}
 	
 	public void Shoot(double rpm){
 		shooterMotors[0].changeControlMode(CANTalon.TalonControlMode.Speed);
 		shooterMotors[0].setF(0.5*(1023*600)/(rpm*4096));
-    	shooterMotors[0].set(rpm);
+    	shooterMotors[0].set(rpm + shooterRPMOffset);
     	displayEnc();
     	SmartDashboard.putNumber("TargetRPM", rpm);
 
@@ -168,9 +232,21 @@ public class Shooter extends Subsystems{
 		indexerMotors[0].set(rpm);
 	}
 	
+	public double turretPosition(){
+		return turretMotors[0].getPosition();
+	}
+	
+	public void stoppedPID(){
+		if (Math.abs(turretMotors[0].getClosedLoopError()) < 50 && Math.abs(turretMotors[0].getSpeed()) < 5){
+			turretMotors[0].setProfile(1);
+		}
+	}
+	
 	
 	public boolean moveTurret(double amount){
-		turretMotors[0].changeControlMode(TalonControlMode.Position);
+		/* set acceleration and vcruise velocity - see documentation */
+
+		
 		boolean turn = true;
 		boolean rev_limit = turretMotors[0].isRevLimitSwitchClosed();
 		boolean fwd_limit = turretMotors[0].isFwdLimitSwitchClosed();
@@ -196,7 +272,10 @@ public class Shooter extends Subsystems{
 		if(turn){
 			turretPosition = turretMotors[0].getPosition()+amount;
 			System.out.println("setPosition: " + turretPosition);
+			setTurretPID(turretPosition);
+			//turretTarget = 0;
 			turretMotors[0].set(turretPosition);
+			
 		}
 		return rev_limit || fwd_limit;
 	}
@@ -232,14 +311,15 @@ public class Shooter extends Subsystems{
 		
 		
 	}else{
-		turnTicks = ticks/5;
+		turnTicks = ticks/2;
 	}
 	
-	if(Math.abs(turnTicks) > 0.3){
-		turnTicks = Math.signum(turnTicks)*0.3;
+	if(Math.abs(turnTicks) > 0.5){
+		turnTicks = Math.signum(turnTicks)*0.5;
 	}
 	
 	SmartDashboard.putNumber("turnTicks", turnTicks);
+	turretTarget =0;
 	moveTurret(turnTicks);
 		}else{
 			System.out.println("Turn Turret - Turret Timer Running");
@@ -248,21 +328,36 @@ public class Shooter extends Subsystems{
 	
 	
 	public void alignTurret(){
+		shooterRPMOffset = 0;
+		turretTarget = turretPosition();
 		if(!centeringInProgress){
 		centeringTurret	 = new Timer();
-		centeringTurret.schedule(new centerTurret(), 0L, 10L); //time in milliseconds
+		centeringTurret.schedule(new centerTurret(), 0L, 2L); //time in milliseconds
 		centeringInProgress = true;
 		}
 	}
 	
 	public int turnTurretToDegree(double _degree){
-		System.out.println("degreeTurnInProgress" + degreeTurnInProgress);
+		targetPosition =   (Constants.FWDLimit +(_degree/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
 		if(!degreeTurnInProgress){
+		System.out.println("degreeTurnInProgress" + degreeTurnInProgress);
+		turretMotors[0].changeControlMode(TalonControlMode.MotionMagic);
+		//turretMotors[0].setProfile(0);
+		turretMotors[0].setF(0.5);
+		/* set acceleration and vcruise velocity - see documentation */
+		turretMotors[0].setMotionMagicCruiseVelocity(1000);
+		turretMotors[0].setMotionMagicAcceleration(500);
+		setTurretPID(targetPosition);
+		turretTarget = 0;
+		turretMotors[0].set(targetPosition);
+		/*if(!degreeTurnInProgress){
 		turningTurretTimer	= new Timer();
 		turningTurretTimer.schedule(new turnToDegree(_degree), 0L, 2L); //time in milliseconds
 		degreeTurnInProgress = true;
+		}*/
 		}
-		return degreeTurnFinished;
+		degreeTurnInProgress = (turretMotors[0].getClosedLoopError() < 50);
+		return (degreeTurnInProgress?1:0);
 	}
 	
 	
@@ -271,73 +366,134 @@ public class Shooter extends Subsystems{
 		System.out.println("REVLimitFound : " + REVLimitFound);
 		if(!REVLimitSearching){
 		REVLimitTimer	 = new Timer();
-		REVLimitTimer.schedule(new findREVLimit(), 0L, 2L); //time in milliseconds
+		REVLimitTimer.schedule(new findREVLimit(), 0L, 5L); //time in milliseconds
 		REVLimitSearching = true;
 		}
 		return REVLimitFound;
 	}
 	
 	class centerTurret extends TimerTask {
+		private int turretCenteringCounter = 0;
+		private int size;
+	    private double total = 0d;
+	    private int index = 0;
+	    private double samples[];
+	    private double min = Double.MAX_VALUE;
+	    private double max = -1*Double.MAX_VALUE;
+	    private boolean found = false;
+	    
+	    
 		//Turret Timer 1
+		public centerTurret(){
+			turretCenteringCounter =0;
+			rolling(10);
+			found = false;
+		}
+		
+
+
+	    private void rolling (int _size) {
+	        size = _size;
+	        samples = new double[size];
+	        for (int i = 0; i < size; i++) samples[i] = 0d;
+	    }
+
+	    public void add(double x) {
+	    	
+	    	total -= samples[index];
+	        samples[index] = x;
+	        total += x;
+	        if (++index == size) index = 0;
+		    min = Double.MAX_VALUE;
+		    max = -1*Double.MAX_VALUE;
+	        for (int i = 0;i<size; i++){
+	        	if(samples[i] > max){max =samples[i];}
+		    	if(samples[i] < min){min = samples[i];}
+	        }
+	        
+	    }
+
+	    public double getAverage() {
+	        return total / size;
+	    }   
+	    
+	    public double getRange() {
+	    	for(int i=0;i<size; i++){
+	    	System.out.println(samples[i]);
+	    	}
+	    	System.out.println(" ---- ");
+	    	System.out.println("Max: " + max + " Min: " + min);
+	        return max-min;
+	    }  
+	    
         public void run() {
         	if(turretTimerRunning ==0 || turretTimerRunning == 1){
         		turretTimerRunning =1;
     	double turnTicks = 0;
     	//need to make it go the other way if possible to reach target (edge case);
     	System.out.println(System.nanoTime() + " Boiler visible"  + listener.getBoilerVisible());
+    	System.out.println("Found "  + found);
+		SmartDashboard.putBoolean("turretCentered", false);
     	if(listener.getBoilerVisible()){
-    		getDistance();
-     		double center = (Constants.IMAGE_WIDTH/2)-Constants.IMAGE_WIDTH*((Math.tan(Constants.CAMERA_OFFSET/(distance*12)))*(180/Math.PI)/Constants.AXIS_FOV);
-    		double centerOffset = center-Constants.centerX;
-        	System.out.println(System.nanoTime() + " distance"  + distance);
-        	System.out.println(System.nanoTime() + " center"  + center);
-        	System.out.println(System.nanoTime() + " Constants.centerX"  + Constants.centerX);
-        	System.out.println(System.nanoTime() + " centerOffset"  + centerOffset);
-
-        	
-    		SmartDashboard.putNumber("distance", distance);
-
-     		SmartDashboard.putNumber("centerOffset", centerOffset);
-    		double degreeOffset = Constants.AXIS_FOV*(centerOffset/Constants.IMAGE_WIDTH);
-    		turnTicks = ((degreeOffset/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
-    		if(Math.abs(centerOffset) > 20){
-        	System.out.println(System.nanoTime() + " degreeOffset"  + degreeOffset);
-        	System.out.println(System.nanoTime() + " turnTicks"  + turnTicks);
-    		
-    		SmartDashboard.putNumber("centerOffset", centerOffset);
-    		SmartDashboard.putNumber("degreeOffset", degreeOffset);
-    		SmartDashboard.putNumber("lastFrame", listener.getFrameCount());
-    		turnTicks /= 10;
+    		if(turretCenteringCounter < 20 && !found ){
+    			add(turretMotors[0].getPosition());
+    			//SmartDashboard.putNumber("movingAvg", getAverage());
+    			SmartDashboard.putNumber("turretSpeed", turretMotors[0].getSpeed());
+    			SmartDashboard.putNumber("Range", getRange());
+            	//System.out.println("Range" + " " + getRange());
+    			if(getRange()< 0.005){
+	    		if(listener.getFrameCount() !=lastFrame){
+	    			turretCenteringCounter++;
+	            	System.out.println("Speed" + " " + Math.abs(turretMotors[0].getSpeed()));
+	            	System.out.println("ClosedLoopError" + " " + Math.abs(turretMotors[0].getClosedLoopError()));
+	    			//turretMotors[0].set(turretMotors[0].getPosition());
+	    			getDistance();
+	            	System.out.println(System.nanoTime() + " " + turretCenteringCounter);
+	    			double center = (Constants.IMAGE_WIDTH/2)+60-Constants.IMAGE_WIDTH*((Math.tan(Constants.CAMERA_OFFSET/(distance*12)))*(180/Math.PI)/Constants.AXIS_FOV);
+	    			System.out.println("Center" + center);
+	    	 		double centerOffset = center-Constants.centerX;
+	    			System.out.println("Constants.centerX" + Constants.centerX);
+	    			System.out.println("CenterOffset" + centerOffset);
+	    			double degreeOffset = Constants.AXIS_FOV*(centerOffset/Constants.IMAGE_WIDTH);
+	    			System.out.println("DegreeOffset" + degreeOffset);
+	    	    	turnTicks = 0.7*(((degreeOffset)/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
+	    			System.out.println("turnTicks" + turnTicks);
+	    			System.out.println("Position" + turretMotors[0].getPosition());
+	    			double turretSet = turretMotors[0].getPosition()+turnTicks;
+	    			if(Math.abs(centerOffset) > 7){
+	    				setTurretPID(turretSet);
+    					turretTarget = 0;
+	    				turretMotors[0].set(turretSet);
+	    			}else{
+	    				found = true;
+	    			}
+	    		}
+    			}
     		}else{
-            	System.out.println(System.nanoTime() + "Final degreeOffset"  + degreeOffset);
-            	System.out.println(System.nanoTime() + "Final turnTicks"  + turnTicks);
-
-        		SmartDashboard.putNumber("centerOffset", centerOffset);
-        		SmartDashboard.putNumber("degreeOffset", degreeOffset);
-        		SmartDashboard.putNumber("lastFrame", listener.getFrameCount());
-
             	System.out.println(System.nanoTime() + " centeringDone");
+            	System.out.println(System.nanoTime() + " " + turretCenteringCounter);
     			turretTimerRunning = 0;
     			centeringInProgress = false;
+    			turretTarget = turretPosition();
     			centeringTurret.cancel();
     			centeringTurret.purge();
     		}
-    		
-    		
+
     	}else{
     		turnTicks = autoTurretDirection *0.2;
+    		moveTurret(turnTicks);
     	}
     	
-    	if(Math.abs(turnTicks) > 0.15){
+    	/*if(Math.abs(turnTicks) > 0.15){
     		turnTicks = Math.signum(turnTicks)*0.15;
-    	}
+    	}*/
     	System.out.println("Ticks: " + turnTicks);
     	
 
     	
     	
     	//normally open switches, with signal connected to ground - default state is that signal pin is pulled high by RIO. A low signal represents a pressed button.
-    	moveTurret(turnTicks);
+    	
 
     	
     	SmartDashboard.putNumber("CenterX", Constants.centerX);
@@ -367,7 +523,7 @@ public class Shooter extends Subsystems{
 	    	if(turretTimerRunning ==0 || turretTimerRunning ==2){
 	    		turretTimerRunning = 2;
 			if (!REVLimitFound){
-				 turnTicks = 0.1;
+				 turnTicks = 0.5;
 			}
 	    	System.out.println("turretPosition" + turretMotors[0].getPosition() + "REVLimit" + Constants.REVLimit);
 	    	moveTurret(turnTicks);
@@ -385,7 +541,7 @@ public class Shooter extends Subsystems{
 	}
 	
 	
-	class turnToDegree extends TimerTask {
+	/*class turnToDegree extends TimerTask {
     	private double turnTicks = 0;
     	
     	private double turnDegrees = 0;
@@ -435,7 +591,7 @@ public class Shooter extends Subsystems{
 	    	}
 	    	
 	        }
-	}
+	}*/
 	
 	
 	/*class turnToDegreeSpeed extends TimerTask {
@@ -506,6 +662,7 @@ public class Shooter extends Subsystems{
 		turningTurretTimer.cancel();
 		}
 		turretTimerRunning = 0;
+		centeringInProgress = false;
 	}
     
     
@@ -514,8 +671,8 @@ public class Shooter extends Subsystems{
 		return turretMotors[0].getEncPosition();
 	}*/
 	public void resetTurret(){
-		turretMotors[0].setEncPosition(0);
-		turretMotors[0].setPosition(0);
+		/*turretMotors[0].setEncPosition(0);
+		turretMotors[0].setPosition(0);*/
 	}
 
 	
@@ -595,7 +752,8 @@ public class Shooter extends Subsystems{
 
             
 
-        	System.out.println("Time: " + Math.round((System.nanoTime()-time_offset)/1e6) + "ms; outA: " +  motorOutputA + "; outB: " + motorOutputB + " spd: " + shooterMotors[0].getSpeed() + "; err: " +shooterMotors[0].getClosedLoopError());
+    	//System.out.println("Time: " + Math.round((System.nanoTime()-time_offset)/1e6) + "ms; outA: " +  motorOutputA + "; outB: " + motorOutputB + " spd: " + shooterMotors[0].getSpeed() + "; err: " +shooterMotors[0].getClosedLoopError());
+    	System.out.println("Time: " + Math.round((System.nanoTime()-time_offset)/1e6) + "ms; pos: " + turretMotors[0].getPosition() + "; err: " +turretMotors[0].getClosedLoopError());
         
 
 	    

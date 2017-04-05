@@ -95,6 +95,7 @@ public final class Constants {
 	public static int CCW_LIMIT_SWITCH = 0;
 	public static int CW_LIMIT_SWITCH = 1;
 	public static int GEAR_SWITCH = 2;
+	public static int GEAR_LIGHT = 3;
 	public static int PRACTICE_BOT = 9; //jumper to short pins on practice bot
 	
 	
@@ -230,13 +231,13 @@ public final class Constants {
 		TURRET.free_speed=13180; //free_speed
 		TURRET.gearing=10; //gearing
 		TURRET.target=100; //rpm
-		TURRET.mode = CANTalon.TalonControlMode.Position;
+		TURRET.mode = CANTalon.TalonControlMode.MotionMagic;
 		TURRET.reverse_encoder = false; //reverse_encoder
 		TURRET.invert = false;
-		TURRET.PID_F=0; //PID_F
-		TURRET.PID_P=0.7; //PID_P
+		TURRET.PID_F=0.3; //PID_F
+		TURRET.PID_P=8; //PID_P
 		TURRET.PID_I=0.0; //PID_I
-		TURRET.PID_D=0.4; //PID_D
+		TURRET.PID_D=5; //PID_D
 		TURRET.motors= new Motor[] {
 				new Motor(12, MASTER, 0),
 		};

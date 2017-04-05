@@ -48,11 +48,7 @@ public class GearBallRightHopper  extends AutonomousRoutine{
 		System.out.println("Auto Step (Straight Gear): " + autoStep);
 		double turretInit = 0;
 		if (robotShooter.findTurretREVLimit() && turretInit == 0){
-			if(Constants.IS_PRACTICE_BOT){
-				turretInit = robotShooter.turnTurretToDegree(Constants.PRACTICE_BOT_RIGHT_HOPPER_TURRET_START);
-			}else{
-				turretInit = robotShooter.turnTurretToDegree(Constants.COMP_BOT_RIGHT_HOPPER_TURRET_START);
-			}
+			turretInit = robotShooter.turnTurretToDegree(-50);
 		}
 		
 		
@@ -131,7 +127,7 @@ public class GearBallRightHopper  extends AutonomousRoutine{
 			if(!done_before && turretInit ==1){
 				robotShooter.alignTurret();
 				done_before = true;
-			}else if (!robotShooter.centeringInProgress && !readyToShoot){
+			}else if (!robotShooter.centeringInProgress && !readyToShoot && done_before){
 				robotShooter.getDistance();
 				readyToShoot = true;
 			}else if (readyToShoot){

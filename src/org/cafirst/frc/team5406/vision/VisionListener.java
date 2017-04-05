@@ -43,7 +43,7 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 	            int small = 0;
 	            
 	            for(int i = 0; i < pipeline.findContoursOutput().size(); i++)
-	            	if(Imgproc.boundingRect(pipeline.findContoursOutput().get(i)).width > 37)
+	            	if(Imgproc.boundingRect(pipeline.findContoursOutput().get(i)).width > 32 && Imgproc.boundingRect(pipeline.findContoursOutput().get(i)).height > 7)
 	            	{
 	            		small = i;
 	            		break;
@@ -55,7 +55,7 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 	            int big = 0;
 	            
 	            for(int i = small + 1; i < pipeline.findContoursOutput().size(); i++)
-	            	if(Imgproc.boundingRect(pipeline.findContoursOutput().get(i)).width > 37)
+	            	if(Imgproc.boundingRect(pipeline.findContoursOutput().get(i)).width > 32 && Imgproc.boundingRect(pipeline.findContoursOutput().get(i)).height > 7)
 	            	{
 	            		big = i;
 	            		break;
@@ -127,12 +127,14 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 	            SmartDashboard.putString("Bottom Left", bottomLeft.x + " , " + bottomLeft.y);
 	            
 	            SmartDashboard.putNumber("SmallHeight", smallHeight);
+	            SmartDashboard.putNumber("SmallWidth", smallHeight == smallRect.size.width ? smallRect.size.height : smallRect.size.width);
 	            
 	            SmartDashboard.putNumber("BigHeight", bigHeight);
+	            SmartDashboard.putNumber("BigWidth", bigHeight == bigRect.size.width ? bigRect.size.height : bigRect.size.width);
 	            
 	            SmartDashboard.putNumber("Vision Length", length);
 	            SmartDashboard.putNumber("Contours", pipeline.findContoursOutput().size());
-	            boilerVisible = (Imgproc.boundingRect(pipeline.findContoursOutput().get(small)).width > 37) && (Imgproc.boundingRect(pipeline.findContoursOutput().get(big)).width > 37);
+	            boilerVisible = (Imgproc.boundingRect(pipeline.findContoursOutput().get(small)).width > 32) && (Imgproc.boundingRect(pipeline.findContoursOutput().get(big)).width > 32) && (Imgproc.boundingRect(pipeline.findContoursOutput().get(small)).height > 7) && (Imgproc.boundingRect(pipeline.findContoursOutput().get(big)).height > 7);
 	            frameCount++;
 		}
 		

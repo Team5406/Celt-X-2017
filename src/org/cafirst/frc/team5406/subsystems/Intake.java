@@ -4,6 +4,7 @@ import org.cafirst.frc.team5406.robot.Constants;
 import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -14,6 +15,7 @@ public class Intake extends Subsystems{
 	private CANTalon[] intakeMotors;
 	private long startTime = 0;
     public static DigitalInput gearSwitch = new DigitalInput(Constants.GEAR_SWITCH);
+    public static DigitalOutput gearLight = new DigitalOutput(Constants.GEAR_LIGHT);
     private static DoubleSolenoid gearGripSolenoid = new DoubleSolenoid(Constants.GEAR_GRIP_FORWARD, Constants.GEAR_GRIP_REVERSE);;
     private static DoubleSolenoid gearLiftSolenoid = new DoubleSolenoid(Constants.GEAR_LIFT_FORWARD, Constants.GEAR_LIFT_REVERSE);;
 	private boolean grip = false;
@@ -58,6 +60,8 @@ public class Intake extends Subsystems{
 	
 	public void autoGearLift(){
 		SmartDashboard.putBoolean("Gear", haveGear());
+		gearLight.set(haveGear());
+		
 		/*if(haveGear() && !gear_lifted){
 			gear_lifted = true;
 			liftGear();

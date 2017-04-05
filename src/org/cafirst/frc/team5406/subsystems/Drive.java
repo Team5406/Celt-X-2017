@@ -112,7 +112,14 @@ public class Drive extends Subsystems{
 
 	
 	public double[] getPosition(){
-		double[] currentPosition = {leftDriveMotors[0].getPosition(), rightDriveMotors[0].getPosition()};
+		double[] currentPosition = new double[2];
+		if (Constants.IS_PRACTICE_BOT){
+			currentPosition[0] = leftDriveMotors[0].getPosition();
+			currentPosition[1] = rightDriveMotors[0].getPosition();
+		}else{
+			currentPosition[0] = rightDriveMotors[0].getPosition();
+			currentPosition[1] = leftDriveMotors[0].getPosition();
+		}
 		return currentPosition;
 	}
 	
