@@ -41,10 +41,11 @@ public class Robot extends IterativeRobot {
 	 */
 	Constants constants = new Constants();
 	Util util = new Util();
-	private Intake robotIntake = new Intake();;
-	private Climber robotClimber = new Climber();;
-	private Drive robotDrive = new Drive();;
-	private Shooter robotShooter = new Shooter();;
+    public static DigitalInput practiceBot = new DigitalInput(Constants.PRACTICE_BOT);
+	private Intake robotIntake = new Intake();
+	private Climber robotClimber = new Climber();
+	private Drive robotDrive = new Drive();
+	private Shooter robotShooter = new Shooter();
 	private XboxController driverGamepad;
 	private XboxController operatorGamepad;
     DoubleSolenoid shiftSolenoid;
@@ -55,13 +56,12 @@ public class Robot extends IterativeRobot {
 	private boolean autoDone = false;
 	private boolean magicTurret = false;
 	private int autoCounter = 0;
-    public static DigitalInput practiceBot = new DigitalInput(Constants.PRACTICE_BOT);
 
 	private AutonomousRoutine selectedRoutine;
 	private SendableChooser<Object> autonomousSelector = new SendableChooser<>();
 	double turretInit = 0;
 	
-	private final boolean CALIBRATION_MODE = true;
+	private final boolean CALIBRATION_MODE = false;
 	private Calibration calibrator;
 
 
@@ -76,7 +76,8 @@ public class Robot extends IterativeRobot {
 		
 		SmartDashboard.putNumber("Rand", Math.random());
 		
-		
+		robotShooter.cameraOffset = (Constants.IS_PRACTICE_BOT?205:291);
+
 		selectedRoutine = new DoNothing();
     	
     	//Initialize Drive Controller - only using one for TShirt Cannon
@@ -137,6 +138,7 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		robotShooter.getLimitSwitches();
 		robotShooter.displayTurretPos();
+		robotShooter.stoppedPID();
 		
 		if(CALIBRATION_MODE){
 			//STEP 1: Drive Forward
@@ -172,10 +174,10 @@ public class Robot extends IterativeRobot {
 				calibrator.changeRPM(-5);
 				break;
 			case LEFT:
-				calibrator.adjustTurret(-10);
+				calibrator.adjustTurret(10);
 				break;
 			case RIGHT:
-				calibrator.adjustTurret(10);
+				calibrator.adjustTurret(-10);
 				break;
 			}
 
@@ -286,7 +288,7 @@ public class Robot extends IterativeRobot {
 		boolean button_pressed = false;
 		if(util.applyDeadband(operatorGamepad.getRightTrigger())!=0){
 			if(!button_pressed){
-				robotShooter.Shoot(Math.abs(operatorGamepad.getRightTrigger())*5700);
+				robotShooter.Shoot();
 				if(operatorGamepad.getButtonHeld(XboxController.Y_BUTTON)){
 					robotShooter.BallPump(1);
 					}else{
@@ -371,9 +373,12 @@ public class Robot extends IterativeRobot {
 			break;
 		case LEFT:
 			robotShooter.adjustTurret(10);
+			robotShooter.stopTimer();
 			break;
 		case RIGHT:
 			robotShooter.adjustTurret(-10);
+			robotShooter.stopTimer();
+
 			break;
 		}
 		

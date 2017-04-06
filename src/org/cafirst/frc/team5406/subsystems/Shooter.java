@@ -55,7 +55,7 @@ public class Shooter extends Subsystems{
 	private double targetPosition;
 	private double shooterRPMOffset = 0;
 	private double turretTarget = 0;
-
+	public double cameraOffset; //Set in RobotInit()
 
 
 	public Shooter(){
@@ -84,8 +84,8 @@ public class Shooter extends Subsystems{
 		turretMotors[0].enableReverseSoftLimit(false);
 		
 
-		turretMotors[0].setMotionMagicCruiseVelocity(1000);
-		turretMotors[0].setMotionMagicAcceleration(1000);
+		turretMotors[0].setMotionMagicCruiseVelocity(2000);
+		turretMotors[0].setMotionMagicAcceleration(2000);
 		turretMotors[0].setProfile(1);
 		turretMotors[0].setP(0.5);
 		turretMotors[0].setI(0);
@@ -162,7 +162,7 @@ public class Shooter extends Subsystems{
 	
 	public void displayTurretPos(){
 		getDistance();
- 		double center = (Constants.IMAGE_WIDTH/2)+60-Constants.IMAGE_WIDTH*((Math.tan(Constants.CAMERA_OFFSET/(distance*12)))*(180/Math.PI)/Constants.AXIS_FOV);
+ 		double center = cameraOffset;
  		double centerOffset = center-Constants.centerX;
 		double degreeOffset = Constants.AXIS_FOV*(centerOffset/Constants.IMAGE_WIDTH);
     	double turnTicks = ((degreeOffset/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
@@ -189,7 +189,7 @@ public class Shooter extends Subsystems{
 			rpm = 0.6372*Math.pow(distance, 2)-51.553*distance+6111.7;
 		}else{
 			//rpm = 61.49*distance*distance-561.5*distance+6419;
-			rpm = 0.1002*topRight.y*topRight.y-40.57*topRight.y+9003;
+			rpm = 0.2712*topRight.y*topRight.y-114.99*topRight.y+16973;
 		}
 		
 		return rpm;
@@ -237,9 +237,14 @@ public class Shooter extends Subsystems{
 	}
 	
 	public void stoppedPID(){
-		if (Math.abs(turretMotors[0].getClosedLoopError()) < 50 && Math.abs(turretMotors[0].getSpeed()) < 5){
+		System.out.println("Err: " + turretMotors[0].getClosedLoopError() + ", Speed: " + turretMotors[0].getSpeed());
+		/*if (Math.abs(turretMotors[0].getClosedLoopError()) < 50 && Math.abs(turretMotors[0].getSpeed()) < 5){
+			System.out.println("Setting to Profile 1");
 			turretMotors[0].setProfile(1);
-		}
+		}else{
+			turretMotors[0].setProfile(0);
+
+		}*/
 	}
 	
 	
@@ -332,7 +337,7 @@ public class Shooter extends Subsystems{
 		turretTarget = turretPosition();
 		if(!centeringInProgress){
 		centeringTurret	 = new Timer();
-		centeringTurret.schedule(new centerTurret(), 0L, 2L); //time in milliseconds
+		centeringTurret.schedule(new centerTurret(), 0L, 20L); //time in milliseconds
 		centeringInProgress = true;
 		}
 	}
@@ -431,63 +436,80 @@ public class Shooter extends Subsystems{
         		turretTimerRunning =1;
     	double turnTicks = 0;
     	//need to make it go the other way if possible to reach target (edge case);
-    	System.out.println(System.nanoTime() + " Boiler visible"  + listener.getBoilerVisible());
-    	System.out.println("Found "  + found);
+    	//System.out.println(System.nanoTime() + " Boiler visible"  + listener.getBoilerVisible());
+    	//System.out.println("Found "  + found);
 		SmartDashboard.putBoolean("turretCentered", false);
-    	if(listener.getBoilerVisible()){
-    		if(turretCenteringCounter < 20 && !found ){
-    			add(turretMotors[0].getPosition());
-    			//SmartDashboard.putNumber("movingAvg", getAverage());
-    			SmartDashboard.putNumber("turretSpeed", turretMotors[0].getSpeed());
-    			SmartDashboard.putNumber("Range", getRange());
-            	//System.out.println("Range" + " " + getRange());
-    			if(getRange()< 0.005){
-	    		if(listener.getFrameCount() !=lastFrame){
-	    			turretCenteringCounter++;
-	            	System.out.println("Speed" + " " + Math.abs(turretMotors[0].getSpeed()));
-	            	System.out.println("ClosedLoopError" + " " + Math.abs(turretMotors[0].getClosedLoopError()));
-	    			//turretMotors[0].set(turretMotors[0].getPosition());
-	    			getDistance();
-	            	System.out.println(System.nanoTime() + " " + turretCenteringCounter);
-	    			double center = (Constants.IMAGE_WIDTH/2)+60-Constants.IMAGE_WIDTH*((Math.tan(Constants.CAMERA_OFFSET/(distance*12)))*(180/Math.PI)/Constants.AXIS_FOV);
-	    			System.out.println("Center" + center);
-	    	 		double centerOffset = center-Constants.centerX;
-	    			System.out.println("Constants.centerX" + Constants.centerX);
-	    			System.out.println("CenterOffset" + centerOffset);
-	    			double degreeOffset = Constants.AXIS_FOV*(centerOffset/Constants.IMAGE_WIDTH);
-	    			System.out.println("DegreeOffset" + degreeOffset);
-	    	    	turnTicks = 0.7*(((degreeOffset)/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
-	    			System.out.println("turnTicks" + turnTicks);
-	    			System.out.println("Position" + turretMotors[0].getPosition());
-	    			double turretSet = turretMotors[0].getPosition()+turnTicks;
-	    			if(Math.abs(centerOffset) > 7){
-	    				setTurretPID(turretSet);
-    					turretTarget = 0;
-	    				turretMotors[0].set(turretSet);
-	    			}else{
-	    				found = true;
+		System.out.println("Frame: " + listener.getFrameCount() + ", LastFrame: " + lastFrame + ", visible: " + listener.getBoilerVisible());
+    	if(listener.getFrameCount() !=lastFrame){
+    		lastFrame = listener.getFrameCount();
+			if(listener.getBoilerVisible()){
+	    		if(turretCenteringCounter < 20 && !found ){
+	    			add(turretMotors[0].getPosition());
+	    			//SmartDashboard.putNumber("movingAvg", getAverage());
+	    			SmartDashboard.putNumber("turretSpeed", turretMotors[0].getSpeed());
+	    			SmartDashboard.putNumber("Range", getRange());
+	            	//System.out.println("Range" + " " + getRange());
+	    			//if(getRange()< 0.005){
+	    			if(Math.abs(turretMotors[0].getSpeed()) < 0.1){
+		    		//if(listener.getFrameCount() !=lastFrame){
+		    			//lastFrame = listener.getFrameCount();
+		    			turretCenteringCounter++;
+		            	System.out.println("Speed" + " " + Math.abs(turretMotors[0].getSpeed()));
+		            	System.out.println("ClosedLoopError" + " " + Math.abs(turretMotors[0].getClosedLoopError()));
+		    			//turretMotors[0].set(turretMotors[0].getPosition());
+		    			getDistance();
+		            	System.out.println(System.nanoTime() + " " + turretCenteringCounter);
+		    			double center = cameraOffset;
+		    			System.out.println("Center" + center);
+		    	 		double centerOffset = center-Constants.centerX;
+		    			System.out.println("Constants.centerX" + Constants.centerX);
+		    			System.out.println("CenterOffset" + centerOffset);
+		    			double degreeOffset = Constants.AXIS_FOV*(centerOffset/Constants.IMAGE_WIDTH);
+		    			System.out.println("DegreeOffset" + degreeOffset);
+		    	    	turnTicks = 0.7*(((degreeOffset)/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
+		    			System.out.println("turnTicks" + turnTicks);
+		    			System.out.println("Position" + turretMotors[0].getPosition());
+		    			double turretSet = turretMotors[0].getPosition()+turnTicks;
+		    			if(Math.abs(centerOffset) > 7){
+		    				setTurretPID(turretSet);
+	    					turretTarget = 0;
+		    				turretMotors[0].set(turretSet);
+		    			}else{
+		    				found = true;
+		    			}
+		    		//}
 	    			}
+	    		}else{
+	            	System.out.println(System.nanoTime() + " centeringDone");
+	            	System.out.println(System.nanoTime() + " " + turretCenteringCounter);
+	    			turretTimerRunning = 0;
+	    			centeringInProgress = false;
+	    			turretTarget = turretPosition();
+	    			centeringTurret.cancel();
+	    			centeringTurret.purge();
 	    		}
-    			}
-    		}else{
-            	System.out.println(System.nanoTime() + " centeringDone");
-            	System.out.println(System.nanoTime() + " " + turretCenteringCounter);
-    			turretTimerRunning = 0;
-    			centeringInProgress = false;
-    			turretTarget = turretPosition();
-    			centeringTurret.cancel();
-    			centeringTurret.purge();
-    		}
-
-    	}else{
-    		turnTicks = autoTurretDirection *0.2;
-    		moveTurret(turnTicks);
+	
+	    	}else{
+	    		System.out.println("Search Else... Err: " + turretMotors[0].getClosedLoopError() + ", Speed: " + turretMotors[0].getSpeed());
+	    		if(Math.abs(turretMotors[0].getSpeed()) < 5){
+	    			turnTicks = autoTurretDirection *1;
+	    			/*try {
+						Thread.sleep(250);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}*/
+	    			//if(!listener.getBoilerVisible()){
+	    			moveTurret(turnTicks);
+	    			//}
+	    		}
+	    	}
     	}
     	
     	/*if(Math.abs(turnTicks) > 0.15){
     		turnTicks = Math.signum(turnTicks)*0.15;
     	}*/
-    	System.out.println("Ticks: " + turnTicks);
+    	//System.out.println("Ticks: " + turnTicks);
     	
 
     	

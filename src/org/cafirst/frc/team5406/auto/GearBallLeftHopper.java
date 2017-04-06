@@ -7,7 +7,7 @@ import org.cafirst.frc.team5406.subsystems.Shooter;
 
 
 
-public class StraightGearBallLeftHopper  extends AutonomousRoutine{
+public class GearBallLeftHopper  extends AutonomousRoutine{
 	private Intake robotIntake;
 	private Shooter robotShooter;
 	private Drive robotDrive;
@@ -20,8 +20,8 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 	
 
 
-	public StraightGearBallLeftHopper(Drive _robotDrive, Intake _robotIntake, Shooter _robotShooter){
-		super("12 - Middle Gear and Left Balls");
+	public GearBallLeftHopper(Drive _robotDrive, Intake _robotIntake, Shooter _robotShooter){
+		super("4 - Left Gear and Left Balls");
 		robotDrive = _robotDrive;
 		robotIntake = _robotIntake;
 		robotShooter = _robotShooter;
@@ -37,8 +37,6 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 		robotDrive.driveAtAngleInit(400, 0.0, true);
 		direction = (Constants.IS_PRACTICE_BOT?1:-1);
 		//robotShooter.alignTurret();
-		robotShooter.Shoot();
-		robotShooter.BallPump(-1);
 	}
 	
 	public void end(){
@@ -50,39 +48,39 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 		System.out.println("Auto Step (Straight Gear): " + autoStep);
 		double turretInit = 0;
 		if (robotShooter.findTurretREVLimit() && turretInit == 0){
-			turretInit = robotShooter.turnTurretToDegree(-110);
-			System.out.println("TurretInit: " + turretInit);
+			turretInit = robotShooter.turnTurretToDegree(-270);
 		}
 		
 		
 		
 		switch (autoStep){
 		case 0:
-			
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (0) " + direction*robotPosition[1]);
-			if( direction*robotPosition[1] > ((111.5-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( direction*robotPosition[0] > ((154-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 1;
-				//robotDrive.DriveStraight(0.2);
 				robotIntake.dropGear(false);
 				robotDrive.resetPosition();
-				robotDrive.driveAtAngleUpdate(0.0, 0.0, true);
-			}else if ( direction*robotPosition[1] > ((90-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAtAngleUpdate(110, 0.0, true);
+				robotDrive.driveAtAngleUpdate(0.0, 60.0, true);
+			} else if( direction*robotPosition[0] > ((130-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(200, 60, true);
+			}else if ( direction*robotPosition[0] > ((82-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(300, 60, true);
 			}
 			break;
+			
 		case 1:
 			if (!gearDelay){
 				gearDelay = true;
-				robotDrive.driveAtAngleUpdate(0.0, 0.0, false);
+				robotDrive.driveAtAngleUpdate(0.0, 60.0, false);
 		    	new java.util.Timer().schedule( 
 		    			new java.util.TimerTask() {
 		    	            @Override
 		    	            public void run() {
 		    	            	autoStep = 2;
 		    	            	robotDrive.resetPosition();
-		    	            	robotDrive.driveAtAngleUpdate(-200, 0.0, false);
-		    	            	//Do we need a this.cancel();?
+		    	            	robotDrive.driveAtAngleUpdate(-500, 60.0, true);
+		    	            	this.cancel();
 		    	            }
 		    	        }, 
 		    	        500 
@@ -91,28 +89,39 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 			break;
 		case 2:
 			robotPosition = robotDrive.getPosition();
-			robotDrive.driveAtAngleUpdate(-300, 0.0, false);
+			robotDrive.driveAtAngleUpdate(-500, 60.0, true);
 			System.out.println("robotPosition (2) " + direction*robotPosition[1]);
-			if(direction*robotPosition[1] < (-12/(Constants.WHEEL_DIAM*Math.PI))){
+			if(Math.abs(direction*robotPosition[1]) < (12/(Constants.WHEEL_DIAM*Math.PI))){
+				robotShooter.Shoot();
+				robotShooter.BallPump(-1);
+				robotIntake.IntakeBalls(50);
+				robotDrive.driveAtAngleUpdate(-500, 0.0, true);
 				autoStep = 3;
-            	robotDrive.resetPosition();
 				robotIntake.liftGear();
-				robotIntake.StopIntake();
-				robotDrive.enableBrake(false);
+				robotDrive.resetPosition();
 			}
 			break;
+		
 		case 3:
 			robotPosition = robotDrive.getPosition();
-			System.out.println("robotPosition (3) " + direction*robotPosition[0]);
-			if( Math.abs(direction*robotPosition[0]) > (108/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAtAngleUpdate(0.0, 90.0, true);
-				robotIntake.IntakeBalls(50);
+			System.out.println("robotPosition (3) 0:" + direction*robotPosition[0] + " 1:" + direction*robotPosition[1]);
+			if( Math.abs(direction*robotPosition[1]) > ((65)/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(500, -45.0, true);
+				robotDrive.resetPosition();
 				autoStep = 4;
-			} else if( Math.abs(direction*robotPosition[0]) <= (108/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAtAngleUpdate(-300, 90.0, true);
 			}
 			break;
 		case 4:
+			robotPosition = robotDrive.getPosition();
+			System.out.println("robotPosition (4) 0:" + direction*robotPosition[0] + " 1:" + direction*robotPosition[1]);
+			if( Math.abs(direction*robotPosition[0]) > ((95)/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(0.0, -90.0, true);
+				autoStep = 5;
+			} else if( Math.abs(direction*robotPosition[0]) > ((24)/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(500, -90.0, true);
+			} 
+			break;
+		case 5:
 			robotDrive.driveAtAngleEnd();
 			robotDrive.enableBrake(false);
 			if(!done_before && turretInit ==1){

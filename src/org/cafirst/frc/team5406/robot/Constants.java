@@ -35,9 +35,14 @@ public final class Constants {
 	public static int MAX_VELOCITY_HIGH = 240;
 	public static int MAX_ACCEL_HIGH = 90;
 	
-	public static double GYRO_PID_P = 0.025;
+	/*public static double GYRO_PID_P = 0.025;
 	public static double GYRO_PID_I = 0.002;
-	public static double GYRO_PID_D = 0.009;
+	public static double GYRO_PID_D = 0.009;*/
+	
+	public static double GYRO_PID_P = 0.021;
+	public static double GYRO_PID_I = 0.001;
+	public static double GYRO_PID_D = 0.0005;
+
 	
 	public static int TURRET_ROTATION_TICKS = 29580;
 	public static int TURRET_ROTATION_DEG = 309;
@@ -235,7 +240,7 @@ public final class Constants {
 		TURRET.reverse_encoder = false; //reverse_encoder
 		TURRET.invert = false;
 		TURRET.PID_F=0.3; //PID_F
-		TURRET.PID_P=8; //PID_P
+		TURRET.PID_P=6; //PID_P
 		TURRET.PID_I=0.0; //PID_I
 		TURRET.PID_D=5; //PID_D
 		TURRET.motors= new Motor[] {

@@ -32,6 +32,7 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 	public void copyPipelineOutputs(GripPipeline pipeline) {
 		
 		SmartDashboard.putNumber("Random Vision", System.nanoTime());
+        frameCount = pipeline.getFrameCount();
 		
 		if(!pipeline.findContoursOutput().isEmpty())
 		{
@@ -135,7 +136,7 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 	            SmartDashboard.putNumber("Vision Length", length);
 	            SmartDashboard.putNumber("Contours", pipeline.findContoursOutput().size());
 	            boilerVisible = (Imgproc.boundingRect(pipeline.findContoursOutput().get(small)).width > 32) && (Imgproc.boundingRect(pipeline.findContoursOutput().get(big)).width > 32) && (Imgproc.boundingRect(pipeline.findContoursOutput().get(small)).height > 7) && (Imgproc.boundingRect(pipeline.findContoursOutput().get(big)).height > 7);
-	            frameCount++;
+	            //frameCount++;
 		}
 		
 		else
