@@ -92,6 +92,7 @@ public class Shooter extends Subsystems{
 		turretMotors[0].setD(0.3);
 		turretMotors[0].setF(0.3);
 		turretMotors[0].setProfile(0);
+		ballPumpMotors[0].setVoltageRampRate(80);
 
 
 		
@@ -189,9 +190,14 @@ public class Shooter extends Subsystems{
 			rpm = 0.6372*Math.pow(distance, 2)-51.553*distance+6111.7;
 		}else{
 			//rpm = 61.49*distance*distance-561.5*distance+6419;
-			rpm = 0.2712*topRight.y*topRight.y-114.99*topRight.y+16973;
+			//rpm = 0.1493*topRight.y*topRight.y-73.296*topRight.y+13931;
+			//rpm = 0.159*topRight.y*topRight.y-78.558*topRight.y+14705;
+			//rpm = 0.1722*topRight.y*topRight.y-86.499*topRight.y+15828+38; //quals
+			rpm = 0.1135*topRight.y*topRight.y-53.514*topRight.y+11276; //elims
+
 		}
-		
+		rpm += indexerMotors[0].getOutputCurrent();
+		if(rpm > 7000){rpm = 7000;}
 		return rpm;
 	}
 	

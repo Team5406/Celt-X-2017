@@ -114,7 +114,7 @@ public class GearBallRightHopper  extends AutonomousRoutine{
 		case 4:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (4) 0:" + direction*robotPosition[0] + " 1:" + direction*robotPosition[1]);
-			if( Math.abs(direction*robotPosition[1]) > ((80)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( Math.abs(direction*robotPosition[1]) > ((55)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(0.0, 90.0, true);
 				autoStep = 5;
 			} else if( Math.abs(direction*robotPosition[1]) > ((20)/(Constants.WHEEL_DIAM*Math.PI))){

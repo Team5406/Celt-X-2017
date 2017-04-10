@@ -8,6 +8,8 @@ import org.opencv.core.Rect;
 import org.opencv.core.RotatedRect;
 import org.opencv.imgproc.Imgproc;
 
+import edu.wpi.cscore.CvSource;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.vision.VisionRunner;
 
@@ -22,11 +24,21 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 	private Point[] bigRectPoints = new Point[0];
 	private Point[] smallRectPoints = new Point[0];
 	
+	//private CvSource gripStream;
+	
 	private double length = 0;
 	
 	private boolean boilerVisible = false;
 	
 	private long frameCount = 0;
+	
+	/*public VisionListener()
+	{
+		super();
+		
+		CameraServer.getInstance().removeServer("Grip");
+		gripStream = CameraServer.getInstance().putVideo("Grip", 480, 360);
+	}*/
 	
 	@Override
 	public void copyPipelineOutputs(GripPipeline pipeline) {
@@ -34,6 +46,8 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 		SmartDashboard.putNumber("Random Vision", System.nanoTime());
         frameCount = pipeline.getFrameCount();
 		
+        //gripStream.putFrame(pipeline.hsvThresholdOutput());
+        
 		if(!pipeline.findContoursOutput().isEmpty())
 		{
 	            
@@ -61,6 +75,8 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 	            		big = i;
 	            		break;
 	            	}
+	            
+	            if(big < -1) big = small;
 	            pipeline.findContoursOutput().get(big).convertTo(bigContour, CvType.CV_32F);
 	            
 	            RotatedRect smallRect = Imgproc.minAreaRect(smallContour);

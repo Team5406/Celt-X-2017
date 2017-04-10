@@ -50,7 +50,7 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 		System.out.println("Auto Step (Straight Gear): " + autoStep);
 		double turretInit = 0;
 		if (robotShooter.findTurretREVLimit() && turretInit == 0){
-			turretInit = robotShooter.turnTurretToDegree(-110);
+			turretInit = robotShooter.turnTurretToDegree(-135);
 			System.out.println("TurretInit: " + turretInit);
 		}
 		

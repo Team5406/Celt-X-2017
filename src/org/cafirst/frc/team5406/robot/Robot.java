@@ -63,6 +63,7 @@ public class Robot extends IterativeRobot {
 	
 	private final boolean CALIBRATION_MODE = false;
 	private Calibration calibrator;
+	private long teleopCounter = 0;
 
 
 
@@ -76,7 +77,7 @@ public class Robot extends IterativeRobot {
 		
 		SmartDashboard.putNumber("Rand", Math.random());
 		
-		robotShooter.cameraOffset = (Constants.IS_PRACTICE_BOT?205:291);
+		robotShooter.cameraOffset = (Constants.IS_PRACTICE_BOT?205:240);
 
 		selectedRoutine = new DoNothing();
     	
@@ -139,6 +140,8 @@ public class Robot extends IterativeRobot {
 		robotShooter.getLimitSwitches();
 		robotShooter.displayTurretPos();
 		robotShooter.stoppedPID();
+		robotClimber.DisplayCurrent();
+		teleopCounter++;
 		
 		if(CALIBRATION_MODE){
 			//STEP 1: Drive Forward
@@ -291,12 +294,21 @@ public class Robot extends IterativeRobot {
 				robotShooter.Shoot();
 				if(operatorGamepad.getButtonHeld(XboxController.Y_BUTTON)){
 					robotShooter.BallPump(1);
-					}else{
-						robotShooter.BallPump(-1);
-					}
+				}else{
+					robotShooter.BallPump(-1);					
+				}
 		    	//robotIntake.IntakeBalls(0.75);
 		    	button_pressed = true;
 			}
+			/*if(teleopCounter < 80){
+				robotShooter.BallPump(-1);
+			}else if(teleopCounter < 100){
+				robotShooter.BallPump(1);
+			}else{
+				teleopCounter=0;
+				robotShooter.BallPump(-1);					
+			}*/
+			
     	//enable brake mode - this is passive - a PID is needed to hold the position.
 		}else{
 			button_pressed = false;
