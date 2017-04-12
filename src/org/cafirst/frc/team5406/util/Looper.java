@@ -20,9 +20,16 @@ public class Looper {
   private Timer looperUpdater;
   
   public Looper(String name, Loopable loopable, double period){
+    this(name, loopable, period, false);
+  }
+  
+  public Looper(String name, Loopable loopable, double period, boolean autoStart){
     this.period = period;
     this.loopable = loopable;
     this.m_name = name;
+    if(autoStart){
+      this.start();
+    }
   }
   
   public void start(){
