@@ -171,7 +171,11 @@ public class Drive extends Subsystems {
     rightDriveMotors[0].enableBrakeMode(enable);
   }
   
-  class PIDLoop extends TimerTask {
+  public void updateSmartDash(){
+    currentMonitor.updateSmartDash();
+  }
+  
+  private class PIDLoop extends TimerTask {
     public double lastAngle = 0;
     private double angle;
     private boolean correct;
@@ -251,6 +255,5 @@ public class Drive extends Subsystems {
       return speed;
     }
   }
-  
   
 }

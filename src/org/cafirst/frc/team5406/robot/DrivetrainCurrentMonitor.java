@@ -106,12 +106,10 @@ public class DrivetrainCurrentMonitor {
     
   }
   
-  public void logSmartDash(){
+  public void updateSmartDash(){
     SmartDashboard.putNumber("gamma", lastScalingFactor);
     SmartDashboard.putNumber("est_current", getEstimatedCurrent());
     SmartDashboard.putNumber("est_voltage", getEstimatedVoltage());
-    SmartDashboard.putNumber("left_w", getLeftSpeed());
-    SmartDashboard.putNumber("right_w", getRightSpeed());
   }
   
 }

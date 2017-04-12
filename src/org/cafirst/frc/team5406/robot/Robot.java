@@ -51,7 +51,7 @@ public class Robot extends IterativeRobot {
   private Calibration calibrator;
   private long teleopCounter = 0;
   
-  private Looper smartdashLooper;
+  private Looper smartDashLooper;
   
   
   @Override
@@ -92,7 +92,7 @@ public class Robot extends IterativeRobot {
     
     SmartDashboard.putString("Robot Status", "Running");
     
-    smartdashLooper = new Looper("smartdash_looper", this::updateSmartDash, 1.0/50);
+    smartDashLooper = new Looper("smartDash_looper", this::updateSmartDash, 1.0/50);
     
   }
   
@@ -424,6 +424,7 @@ public class Robot extends IterativeRobot {
   
   private void updateSmartDash(){
     robotDrive.enableCurrentProtection(SmartDashboard.getBoolean("enableCurrentProtection", false));
+    robotDrive.updateSmartDash();
   }
 }
 
