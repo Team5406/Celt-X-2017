@@ -9,6 +9,7 @@ import com.ctre.CANTalon.FeedbackDevice;
 
 import org.cafirst.frc.team5406.robot.Motor;
 import org.cafirst.frc.team5406.robot.Gearbox;
+import org.cafirst.frc.team5406.util.cxCanTalon;
 
 
 public class Subsystems {
@@ -16,12 +17,12 @@ public class Subsystems {
 		
 	}
 	
-	public CANTalon[] InitializeMotors(Gearbox subsystem_gearbox){
-		CANTalon[] motors = new CANTalon[subsystem_gearbox.motors.length];
+	public cxCanTalon[] InitializeMotors(Gearbox subsystem_gearbox){
+		cxCanTalon[] motors = new cxCanTalon[subsystem_gearbox.motors.length];
 		for (int i = 0; i<subsystem_gearbox.motors.length; i++){
 			Motor motor = subsystem_gearbox.motors[i];
 			
-			motors[i] = new CANTalon(motor.id);
+			motors[i] = new cxCanTalon(motor.id);
 			motors[i].configNominalOutputVoltage(+0.0f, -0.0f);
 			motors[i].configPeakOutputVoltage(+12.0f, -12.0f);
 			

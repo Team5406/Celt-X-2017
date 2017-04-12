@@ -15,9 +15,13 @@ import java.util.TimerTask;
 public class Drive extends Subsystems {
   public boolean precisionDriveX = false;
   public boolean precisionDriveY = false;
-  RobotDrive drive;
-  private CANTalon[] leftDriveMotors;
-  private CANTalon[] rightDriveMotors;
+  
+  private RobotDrive drive;
+  private DrivetrainCurrentMonitor currentMonitor;
+  private Looper currentMonitorLooper;
+  
+  private cxCanTalon[] leftDriveMotors;
+  private cxCanTalon[] rightDriveMotors;
   private DoubleSolenoid shiftSolenoid;
   private boolean highGear = false;
   /**
