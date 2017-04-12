@@ -10,6 +10,7 @@ import org.cafirst.frc.team5406.subsystems.Climber;
 import org.cafirst.frc.team5406.subsystems.Drive;
 import org.cafirst.frc.team5406.subsystems.Intake;
 import org.cafirst.frc.team5406.subsystems.Shooter;
+import org.cafirst.frc.team5406.util.Looper;
 import org.cafirst.frc.team5406.util.Util;
 import org.cafirst.frc.team5406.util.XboxController;
 
@@ -50,11 +51,13 @@ public class Robot extends IterativeRobot {
   private Calibration calibrator;
   private long teleopCounter = 0;
   
+  private Looper smartdashLooper;
+  
   
   @Override
   public void robotInit(){
     /*UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-		camera.setResolution(320, 180);
+    camera.setResolution(320, 180);
 		camera.setFPS(30);*/
     Constants.IS_PRACTICE_BOT = !(practiceBot.get());
     SmartDashboard.putString("Robot Status", "Initializing");
@@ -88,6 +91,8 @@ public class Robot extends IterativeRobot {
     SmartDashboard.putData("Autonomous", autonomousSelector);
     
     SmartDashboard.putString("Robot Status", "Running");
+    
+    smartdashLooper = new Looper("smartdash_looper", this::updateSmartDash, 1.0/50);
     
   }
   
@@ -393,7 +398,6 @@ public class Robot extends IterativeRobot {
       
       
     }
-    
   }
   
   /**
