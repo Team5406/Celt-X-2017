@@ -1,18 +1,25 @@
 package org.cafirst.frc.team5406.subsystems;
 
-import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.cafirst.frc.team5406.robot.Constants;
+import org.cafirst.frc.team5406.robot.DrivetrainCurrentMonitor;
+import org.cafirst.frc.team5406.util.Looper;
+import org.cafirst.frc.team5406.util.Motors;
+import org.cafirst.frc.team5406.util.cxCanTalon;
 
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
 
 public class Drive extends Subsystems {
+  
+  public static final double HIGH_GEAR_RATIO = 4.17;
+  public static final double LOW_GEAR_RATIO = 9.01;
+  
   public boolean precisionDriveX = false;
   public boolean precisionDriveY = false;
   
@@ -23,7 +30,11 @@ public class Drive extends Subsystems {
   private cxCanTalon[] leftDriveMotors;
   private cxCanTalon[] rightDriveMotors;
   private DoubleSolenoid shiftSolenoid;
+  
   private boolean highGear = false;
+  
+  
+  
   /**
    * some example logic on how one can manage an MP
    */
@@ -42,6 +53,9 @@ public class Drive extends Subsystems {
     shiftSolenoid = new DoubleSolenoid(Constants.SHIFT_FORWARD, Constants.SHIFT_REVERSE);
     drive = new RobotDrive(leftDriveMotors[0], rightDriveMotors[0]);
     
+    currentMonitor = new DrivetrainCurrentMonitor(this, Motors.CIM, 3);
+    currentMonitorLooper = new Looper("current_monitor", this::updateCurrentScaling, 1.0/100);
+    
     /** some example logic on how one can manage an MP */
   }
   
@@ -55,6 +69,15 @@ public class Drive extends Subsystems {
       y *= 0.5;
     }
     drive.arcadeDrive(x, y);
+  }
+  
+  /**
+   * This function is called at 100Hz to update the scaling if the voltage drops too low.
+   */
+  private void updateCurrentScaling(){
+    double currentScalar = currentMonitor.getScalingFactor();
+    Arrays.stream(leftDriveMotors).forEach((m) -> m.setSpeedMultiplier(currentScalar));
+    Arrays.stream(rightDriveMotors).forEach((m) -> m.setSpeedMultiplier(currentScalar));
   }
   
   public void DisplayCurrent(){
@@ -72,6 +95,25 @@ public class Drive extends Subsystems {
     highGear = false;
   }
   
+  public boolean isShiftedHigh(){
+    return highGear;
+  }
+  
+  public double getLeftEncVel(){
+    return leftDriveMotors[0].getEncVelocity();  // TODO: Units?
+  }
+  
+  public double getRightEncVel(){
+    return rightDriveMotors[0].getEncVelocity();  // TODO: Units?
+  }
+  
+  public double getLeftSetpoint(){
+    return leftDriveMotors[0].getSetpoint();
+  }
+  
+  public double getRightSetpoint(){
+    return rightDriveMotors[0].getSetpoint();
+  }
   
   public void driveAtAngleInit(double _speed, double _angle, boolean _correct){
     PIDTimer = new Timer();
