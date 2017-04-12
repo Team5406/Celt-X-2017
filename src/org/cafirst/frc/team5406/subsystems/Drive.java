@@ -55,6 +55,7 @@ public class Drive extends Subsystems {
     
     currentMonitor = new DrivetrainCurrentMonitor(this, Motors.CIM, 3);
     currentMonitorLooper = new Looper("current_monitor", this::updateCurrentScaling, 1.0/100);
+    enableCurrentProtection(SmartDashboard.getBoolean("enableCurrentProtection", false));
     
     /** some example logic on how one can manage an MP */
   }
@@ -78,6 +79,11 @@ public class Drive extends Subsystems {
     double currentScalar = currentMonitor.getScalingFactor();
     Arrays.stream(leftDriveMotors).forEach((m) -> m.setSpeedMultiplier(currentScalar));
     Arrays.stream(rightDriveMotors).forEach((m) -> m.setSpeedMultiplier(currentScalar));
+  }
+  
+  public void enableCurrentProtection(boolean enable){
+    Arrays.stream(leftDriveMotors).forEach((m) -> m.enableCurrentProtection(enable));
+    Arrays.stream(rightDriveMotors).forEach((m) -> m.enableCurrentProtection(enable));
   }
   
   public void DisplayCurrent(){
@@ -113,6 +119,10 @@ public class Drive extends Subsystems {
   
   public double getRightSetpoint(){
     return rightDriveMotors[0].getSetpoint();
+  }
+  
+  public void updateBatteryVoltage(){
+    currentMonitor.updateBatteryVoltage();
   }
   
   public void driveAtAngleInit(double _speed, double _angle, boolean _correct){

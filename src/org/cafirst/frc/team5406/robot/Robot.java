@@ -415,6 +415,11 @@ public class Robot extends IterativeRobot {
     selectedRoutine = (AutonomousRoutine)autonomousSelector.getSelected();
     SmartDashboard.putString("Selected Autonomous", selectedRoutine.getName());
     robotShooter.getLimitSwitches();
+    robotDrive.updateBatteryVoltage();
+  }
+  
+  private void updateSmartDash(){
+    robotDrive.enableCurrentProtection(SmartDashboard.getBoolean("enableCurrentProtection", false));
   }
 }
 

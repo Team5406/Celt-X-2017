@@ -31,13 +31,13 @@ public class DrivetrainCurrentMonitor {
     this.drive = drive;
     this.motorType = motorType;
     this.motorsPerSide = motorsPerSide;
-    
-    lastScalingFactor = 1.0;
+  
     pdp = new PowerDistributionPanel(1);
-    updateBatteryVotlage();
+    lastScalingFactor = 1.0;
+    updateBatteryVoltage();
   }
   
-  public void updateBatteryVotlage(){
+  public void updateBatteryVoltage(){
     BATTERY_VOLTAGE = pdp.getVoltage();
   }
   
