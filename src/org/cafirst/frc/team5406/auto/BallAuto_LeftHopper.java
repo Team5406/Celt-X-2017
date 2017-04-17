@@ -17,6 +17,7 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 	private int direction = 1;
 	private boolean turretAligned = false;
 	private boolean readyToShoot = false;
+	private double rpm = 5900;
 	
 
 
@@ -116,15 +117,16 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 			}else if (!robotShooter.centeringInProgress && !readyToShoot && turretAligned){
 				robotShooter.getDistance();
 				System.out.println(System.nanoTime() + " Getting Distance");
-
+				rpm = robotShooter.getRPM();
 				readyToShoot = true;
 			}
 			
 			if (readyToShoot){
 				System.out.println(System.nanoTime() + " Shooting");
-				robotShooter.getDistance();
-				robotShooter.Shoot();
-				robotShooter.Indexer(865);				
+				//robotShooter.getDistance();
+				//robotShooter.Shoot();
+				robotShooter.Shoot(rpm);
+				robotShooter.Indexer(Constants.INDEXER_SPEED);				
 			}
 			//}
 			break;

@@ -123,7 +123,7 @@ public class Calibration{
 	
 	public void shoot(){
 		robotShooter.stopTimer();
-		robotShooter.Indexer(1000);	
+		robotShooter.Indexer(Constants.INDEXER_SPEED);	
 		robotPosition = robotDrive.getPosition();
 		data[0] = (robotPosition[0]+robotPosition[1])/2;
 		data[1] = robotShooter.getImageTop();

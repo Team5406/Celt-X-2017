@@ -17,7 +17,7 @@ public class AutoRightGearLeftBoiler  extends AutonomousRoutine{
 	
 
 	public AutoRightGearLeftBoiler(Drive _robotDrive, Intake _robotIntake){
-		super("7 - Right Gear (Left Hopper)");
+		super("7 - Right Gear (Left Boiler)");
 		robotDrive = _robotDrive;
 		robotIntake = _robotIntake;
 	}

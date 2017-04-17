@@ -24,7 +24,7 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 	private Point[] bigRectPoints = new Point[0];
 	private Point[] smallRectPoints = new Point[0];
 	
-	//private CvSource gripStream;
+	private CvSource gripStream;
 	
 	private double length = 0;
 	
@@ -32,13 +32,13 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 	
 	private long frameCount = 0;
 	
-	/*public VisionListener()
+	public VisionListener()
 	{
 		super();
 		
 		CameraServer.getInstance().removeServer("Grip");
 		gripStream = CameraServer.getInstance().putVideo("Grip", 480, 360);
-	}*/
+	}
 	
 	@Override
 	public void copyPipelineOutputs(GripPipeline pipeline) {
@@ -46,7 +46,7 @@ public class VisionListener implements VisionRunner.Listener<GripPipeline>{
 		SmartDashboard.putNumber("Random Vision", System.nanoTime());
         frameCount = pipeline.getFrameCount();
 		
-        //gripStream.putFrame(pipeline.hsvThresholdOutput());
+        gripStream.putFrame(pipeline.hsvThresholdOutput());
         
 		if(!pipeline.findContoursOutput().isEmpty())
 		{

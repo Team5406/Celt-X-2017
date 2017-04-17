@@ -21,7 +21,7 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 
 
 	public GearBallLeftHopper(Drive _robotDrive, Intake _robotIntake, Shooter _robotShooter){
-		super("4 - Left Gear and Left Balls");
+		super("4 - Left Gear and Left Hopper");
 		robotDrive = _robotDrive;
 		robotIntake = _robotIntake;
 		robotShooter = _robotShooter;
@@ -57,14 +57,14 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 		case 0:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (0) " + direction*robotPosition[1]);
-			if( direction*robotPosition[0] > ((154-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( direction*robotPosition[0] > ((152-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 1;
 				robotIntake.dropGear(false);
 				robotDrive.resetPosition();
 				robotDrive.driveAtAngleUpdate(0.0, 60.0, true);
-			} else if( direction*robotPosition[0] > ((130-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( direction*robotPosition[0] > ((120-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(200, 60, true);
-			}else if ( direction*robotPosition[0] > ((82-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			}else if ( direction*robotPosition[0] > ((75-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(300, 60, true);
 			}
 			break;
@@ -105,7 +105,7 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 		case 3:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (3) 0:" + direction*robotPosition[0] + " 1:" + direction*robotPosition[1]);
-			if( Math.abs(direction*robotPosition[1]) > ((65)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( Math.abs(direction*robotPosition[1]) > ((55)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(500, -45.0, true);
 				robotDrive.resetPosition();
 				autoStep = 4;
@@ -114,10 +114,10 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 		case 4:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (4) 0:" + direction*robotPosition[0] + " 1:" + direction*robotPosition[1]);
-			if( Math.abs(direction*robotPosition[0]) > ((95)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( Math.abs(direction*robotPosition[0]) > ((90)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(0.0, -90.0, true);
 				autoStep = 5;
-			} else if( Math.abs(direction*robotPosition[0]) > ((24)/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( Math.abs(direction*robotPosition[0]) > ((20)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(500, -90.0, true);
 			} 
 			break;
@@ -133,7 +133,7 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 			}else if (readyToShoot){
 				robotShooter.getDistance();
 				robotShooter.Shoot();
-				robotShooter.Indexer(865);				
+				robotShooter.Indexer(Constants.INDEXER_SPEED);				
 			}
 			break;
 		

@@ -133,6 +133,33 @@ public class Shooter extends Subsystems{
 		shooterRPMOffset += amount;
 	}
 	
+	/*public void turretSpeed(){
+		turretMotors[0].changeControlMode(TalonControlMode.PercentVbus);
+ 		double center = cameraOffset;
+		double tolerance = 5;
+		double speed = 0;
+
+		if(Constants.centerX == 0){
+			turretStop();
+		}else if(Constants.centerX > center + tolerance){
+			speed = -0.07 - 0.2 * ((center - Constants.centerX) / center);
+		}else if(Constants.centerX < center - tolerance){
+			speed = 0.07 + 0.2 * ((Constants.centerX - center) / center);
+		}
+		if(Math.abs(speed)>0.5){speed = Math.signum(speed)*0.5;}
+		turretMotors[0].set(speed);
+		
+	}
+	public void turretStop(){
+		turretMotors[0].changeControlMode(TalonControlMode.PercentVbus);
+		turretMotors[0].set(0);
+		//turretMotors[0].changeControlMode(TalonControlMode.Position);
+		//turretMotors[0].set(turretMotors[0].getPosition());
+		
+	}
+*/
+	
+	
 	public void adjustTurret(double amount){
 		System.out.println("turretTarget: " + turretTarget);
 		if(turretTarget ==0){
@@ -179,6 +206,7 @@ public class Shooter extends Subsystems{
 	
 	public double getRPM(){
 		double rpm;
+		double current_offset=0;
  		Point topRight = listener.getTopRightPoint();
 		if(distance < 0.5){
 			getDistance();
@@ -187,24 +215,33 @@ public class Shooter extends Subsystems{
 		
 		if(Constants.IS_PRACTICE_BOT){
 			//rpm = 298.36*distance + 3180.6;
-			rpm = 0.6372*Math.pow(distance, 2)-51.553*distance+6111.7;
+			rpm = 0.95*(0.6372*Math.pow(distance, 2)-51.553*distance+6111.7);
 		}else{
 			//rpm = 61.49*distance*distance-561.5*distance+6419;
 			//rpm = 0.1493*topRight.y*topRight.y-73.296*topRight.y+13931;
 			//rpm = 0.159*topRight.y*topRight.y-78.558*topRight.y+14705;
 			//rpm = 0.1722*topRight.y*topRight.y-86.499*topRight.y+15828+38; //quals
-			rpm = 0.1135*topRight.y*topRight.y-53.514*topRight.y+11276; //elims
-
+			//rpm = 0.1135*topRight.y*topRight.y-53.514*topRight.y+11276; //elims
+			//rpm = 0.1352*topRight.y*topRight.y-63.866*topRight.y+12602; //practice match 1 - 25 ball auto
+			//rpm = 0.1293*topRight.y*topRight.y-60.376*topRight.y+12088; //practice match 2 - middle gear + right balls - too long
+			//rpm = 0.1234*topRight.y*topRight.y-56.886*topRight.y+11574; //match 1 - middle gear + right balls - too short
+			//rpm = 0.1325*topRight.y*topRight.y-61.178*topRight.y+12078; //match 3 - too short
+			//rpm = 0.1135*topRight.y*topRight.y-47.642*topRight.y+9921.4; //last with auto changing distance
+			//rpm = 0.0975*topRight.y*topRight.y-38.543*topRight.y+8832.9; //21 balls auto
+			rpm = 0.0975*topRight.y*topRight.y-38.543*topRight.y+(8858 - 5);
 		}
-		rpm += indexerMotors[0].getOutputCurrent();
+		/*current_offset = indexerMotors[0].getOutputCurrent();
+		
+		rpm += (current_offset>10?10:current_offset);*/
 		if(rpm > 7000){rpm = 7000;}
 		return rpm;
 	}
 	
 	public void Shoot(double rpm){
 		shooterMotors[0].changeControlMode(CANTalon.TalonControlMode.Speed);
+    	rpm += shooterRPMOffset;
 		shooterMotors[0].setF(0.5*(1023*600)/(rpm*4096));
-    	shooterMotors[0].set(rpm + shooterRPMOffset);
+    	shooterMotors[0].set(rpm);
     	displayEnc();
     	SmartDashboard.putNumber("TargetRPM", rpm);
 
@@ -381,6 +418,39 @@ public class Shooter extends Subsystems{
 		REVLimitSearching = true;
 		}
 		return REVLimitFound;
+	}
+	
+	public double centerTurretIteration(){
+    	double turnTicks = 0;
+    	if(listener.getFrameCount() !=lastFrame){
+    		lastFrame = listener.getFrameCount();
+			if(listener.getBoilerVisible()){
+	    			if(Math.abs(turretMotors[0].getSpeed()) < 0.1){
+		    			getDistance();
+		    			double center = cameraOffset;
+		    	 		double centerOffset = center-Constants.centerX;
+		    			double degreeOffset = Constants.AXIS_FOV*(centerOffset/Constants.IMAGE_WIDTH);
+		    	    	turnTicks = 0.7*(((degreeOffset)/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
+		    			double turretSet = turretMotors[0].getPosition()+turnTicks;
+		    			if(Math.abs(centerOffset) > 7){
+		    				setTurretPID(turretSet);
+	    					turretTarget = 0;
+		    				turretMotors[0].set(turretSet);
+		    			}
+	    			}
+	
+	    	}else{
+	    		if(Math.abs(turretMotors[0].getSpeed()) < 5){
+	    			turnTicks = autoTurretDirection *1;
+	    			moveTurret(turnTicks);
+	    		}
+	    	}
+    	}
+		if(listener.getBoilerVisible()){
+    	return 	cameraOffset-Constants.centerX;
+		}else{
+	    	return 	300;
+		}
 	}
 	
 	class centerTurret extends TimerTask {

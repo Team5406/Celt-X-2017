@@ -17,7 +17,8 @@ public class StraightGearBallRightHopper  extends AutonomousRoutine{
 	private int direction = 1;
 	private boolean done_before = false;
 	private boolean readyToShoot = false;
-	
+	private double rpm = 5000;
+
 
 
 	public StraightGearBallRightHopper(Drive _robotDrive, Intake _robotIntake, Shooter _robotShooter){
@@ -60,7 +61,7 @@ public class StraightGearBallRightHopper  extends AutonomousRoutine{
 			
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (0) " + direction*robotPosition[1]);
-			if( direction*robotPosition[1] > ((111.5-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( direction*robotPosition[1] > ((113.5-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 1;
 				//robotDrive.DriveStraight(0.2);
 				robotIntake.dropGear(false);
@@ -102,11 +103,11 @@ public class StraightGearBallRightHopper  extends AutonomousRoutine{
 		case 3:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (3) " + direction*robotPosition[1]);
-			if( Math.abs(direction*robotPosition[1]) > (108/(Constants.WHEEL_DIAM*Math.PI))){
+			if( Math.abs(direction*robotPosition[1]) > (103/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(0.0, -90, true);
 				robotIntake.IntakeBalls(50);
 				autoStep = 4;
-			} else if( Math.abs(direction*robotPosition[1]) <= (108/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( Math.abs(direction*robotPosition[1]) <= (103/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(-300, -90, true);
 			}
 			break;
@@ -122,11 +123,12 @@ public class StraightGearBallRightHopper  extends AutonomousRoutine{
 				done_before = true;
 			}else if (!robotShooter.centeringInProgress &&  !readyToShoot && done_before){
 				robotShooter.getDistance();
+				rpm = robotShooter.getRPM();
 				readyToShoot = true;
 			}else if (readyToShoot){
-				robotShooter.getDistance();
-				robotShooter.Shoot();
-				robotShooter.Indexer(865);				
+				//robotShooter.getDistance();
+				robotShooter.Shoot(rpm);
+				robotShooter.Indexer(Constants.INDEXER_SPEED);				
 			}
 			break;
 		

@@ -60,6 +60,8 @@ public final class Constants {
 	public static double CAMERA_FIELD = Math.PI/3;
 	public static double CAMERA_FIELD_HALF = CAMERA_FIELD/2;
 	
+	public static int INDEXER_SPEED = 1000;
+	
 
 	
 	public static boolean MASTER = true;
@@ -100,7 +102,7 @@ public final class Constants {
 	public static int CCW_LIMIT_SWITCH = 0;
 	public static int CW_LIMIT_SWITCH = 1;
 	public static int GEAR_SWITCH = 2;
-	public static int GEAR_LIGHT = 3;
+	public static int GEAR_LIGHT = 4;
 	public static int PRACTICE_BOT = 9; //jumper to short pins on practice bot
 	
 	

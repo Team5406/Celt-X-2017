@@ -64,6 +64,9 @@ public class Robot extends IterativeRobot {
 	private final boolean CALIBRATION_MODE = false;
 	private Calibration calibrator;
 	private long teleopCounter = 0;
+	private double rpm = 5800;
+	private boolean setRPM = false;
+
 
 
 
@@ -77,7 +80,7 @@ public class Robot extends IterativeRobot {
 		
 		SmartDashboard.putNumber("Rand", Math.random());
 		
-		robotShooter.cameraOffset = (Constants.IS_PRACTICE_BOT?205:240);
+		robotShooter.cameraOffset = (Constants.IS_PRACTICE_BOT?238:275);
 
 		selectedRoutine = new DoNothing();
     	
@@ -141,6 +144,7 @@ public class Robot extends IterativeRobot {
 		robotShooter.displayTurretPos();
 		robotShooter.stoppedPID();
 		robotClimber.DisplayCurrent();
+		robotShooter.DisplayCurrent();
 		teleopCounter++;
 		
 		if(CALIBRATION_MODE){
@@ -285,21 +289,22 @@ public class Robot extends IterativeRobot {
 		//X-Button: Find Turret
 		if(operatorGamepad.getButtonHeld(XboxController.X_BUTTON)){
 			robotShooter.alignTurret();
+			//robotShooter.centerTurretIteration();
 		}
 		
 		//Right Trigger: spin up shooter and ball pump. Spin intake at half speed to push any stray balls into hopper 
-		boolean button_pressed = false;
+		//boolean button_pressed = false;
 		if(util.applyDeadband(operatorGamepad.getRightTrigger())!=0){
-			if(!button_pressed){
-				robotShooter.Shoot();
+			//if(!button_pressed){
+				robotShooter.Shoot(rpm);
 				if(operatorGamepad.getButtonHeld(XboxController.Y_BUTTON)){
 					robotShooter.BallPump(1);
 				}else{
 					robotShooter.BallPump(-1);					
 				}
 		    	//robotIntake.IntakeBalls(0.75);
-		    	button_pressed = true;
-			}
+		    	//button_pressed = true;
+			//}
 			/*if(teleopCounter < 80){
 				robotShooter.BallPump(-1);
 			}else if(teleopCounter < 100){
@@ -311,7 +316,7 @@ public class Robot extends IterativeRobot {
 			
     	//enable brake mode - this is passive - a PID is needed to hold the position.
 		}else{
-			button_pressed = false;
+			//button_pressed = false;
 	    	robotShooter.StopShoot();
 			robotShooter.StopBallPump();
 		}
@@ -326,8 +331,13 @@ public class Robot extends IterativeRobot {
 		//B-Button: Shoot - run indexer to feed balls into shooter wheels.
 		if(operatorGamepad.getButtonHeld(XboxController.B_BUTTON)){
 			SmartDashboard.putBoolean("Shooting", true);
-			robotShooter.Indexer(865);
+			if(!setRPM){
+				rpm = robotShooter.getRPM();
+				setRPM = true;
+			}
+			robotShooter.Indexer(Constants.INDEXER_SPEED);
         }else{
+        	setRPM = false;
 			SmartDashboard.putBoolean("Shooting", false);
 			robotShooter.StopIndexer();
         }
