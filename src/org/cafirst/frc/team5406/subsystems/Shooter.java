@@ -210,12 +210,11 @@ public class Shooter extends Subsystems{
  		Point topRight = listener.getTopRightPoint();
 		if(distance < 0.5){
 			getDistance();
-			
 		}
 		
 		if(Constants.IS_PRACTICE_BOT){
 			//rpm = 298.36*distance + 3180.6;
-			rpm = 0.95*(0.6372*Math.pow(distance, 2)-51.553*distance+6111.7);
+			rpm =  0.0763*topRight.y*topRight.y-28.678*topRight.y+7450;
 		}else{
 			//rpm = 61.49*distance*distance-561.5*distance+6419;
 			//rpm = 0.1493*topRight.y*topRight.y-73.296*topRight.y+13931;
