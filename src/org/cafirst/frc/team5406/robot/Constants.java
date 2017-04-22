@@ -60,7 +60,7 @@ public final class Constants {
 	public static double CAMERA_FIELD = Math.PI/3;
 	public static double CAMERA_FIELD_HALF = CAMERA_FIELD/2;
 	
-	public static int INDEXER_SPEED = 700;
+	public static int INDEXER_SPEED = 900;
 	
 
 	

@@ -44,7 +44,8 @@ public class AutoRightGearRightBoiler  extends AutonomousRoutine{
 		case 0:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (0) " + direction*robotPosition[1]);
-			if( direction*robotPosition[1] > ((161-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			//161
+			if( direction*robotPosition[1] > ((158-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 1;
 				robotIntake.dropGear(false);
 				robotDrive.resetPosition();
