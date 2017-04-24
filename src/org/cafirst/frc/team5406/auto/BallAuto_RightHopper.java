@@ -51,7 +51,7 @@ public class BallAuto_RightHopper  extends AutonomousRoutine{
 		System.out.println("Auto Step (Straight Gear): " + autoStep);
 		double turretInit = 0;
 		if (robotShooter.findTurretREVLimit() && turretInit == 0){
-				turretInit = robotShooter.turnTurretToDegree(-70);
+				turretInit = robotShooter.turnTurretToDegree(-60);
 			
 		}
 		
@@ -65,8 +65,10 @@ public class BallAuto_RightHopper  extends AutonomousRoutine{
 			if( direction*robotPosition[0] > ((113-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(0.0, 90.0, true);
 				autoStep = 1;
+			} else if( direction*robotPosition[0] > ((108-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(200, 90.0, true);
 			} else if( direction*robotPosition[0] > ((93-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAtAngleUpdate(400, 90.0, true);
+						robotDrive.driveAtAngleUpdate(400, 90.0, true);
 			}else if ( direction*robotPosition[0] > ((75-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(400, 45.0, true);
 				robotIntake.IntakeBalls(50);

@@ -35,11 +35,9 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 		autoStep =0;
 		gearDelay = false;
 		robotDrive.enableBrake(true);
-		robotDrive.driveAtAngleInit(400, 0.0, true);
+		robotDrive.driveAtAngleInit(300, 0.0, true);
 		direction = (Constants.IS_PRACTICE_BOT?1:-1);
 		//robotShooter.alignTurret();
-		robotShooter.Shoot();
-		robotShooter.BallPump(-1);
 	}
 	
 	public void end(){
@@ -51,7 +49,7 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 		System.out.println("Auto Step (Straight Gear): " + autoStep);
 		double turretInit = 0;
 		if (robotShooter.findTurretREVLimit() && turretInit == 0){
-			turretInit = robotShooter.turnTurretToDegree(-135);
+			turretInit = robotShooter.turnTurretToDegree(-122);
 			System.out.println("TurretInit: " + turretInit);
 		}
 		
@@ -94,7 +92,7 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 			robotPosition = robotDrive.getPosition();
 			robotDrive.driveAtAngleUpdate(-300, 0.0, false);
 			System.out.println("robotPosition (2) " + direction*robotPosition[1]);
-			if(direction*robotPosition[1] < (-12/(Constants.WHEEL_DIAM*Math.PI))){
+			if(Math.abs(direction*robotPosition[1]) > (16/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 3;
             	robotDrive.resetPosition();
 				robotIntake.liftGear();
@@ -105,12 +103,14 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 		case 3:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (3) " + direction*robotPosition[0]);
-			if( Math.abs(direction*robotPosition[0]) > (103/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAtAngleUpdate(0.0, 90.0, true);
+			if( Math.abs(direction*robotPosition[0]) > (99/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(0.0, 95.0, true);
 				robotIntake.IntakeBalls(50);
 				autoStep = 4;
-			} else if( Math.abs(direction*robotPosition[0]) <= (103/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAtAngleUpdate(-300, 90.0, true);
+			} else if( Math.abs(direction*robotPosition[0]) <= (99/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(-300, 95.0, true);
+				robotShooter.Shoot();
+				robotShooter.BallPump(-1);
 			}
 			break;
 		case 4:

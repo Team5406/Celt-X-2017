@@ -23,7 +23,7 @@ public final class Constants {
 	public static int COMP_BOT_RIGHT_HOPPER_TURRET_START = -70; //degrees
 	
 	//drive constants - units in inches
-	public static int WHEEL_BASE = 34;
+	public static int WHEEL_TRACK = 34;
 	public static int ROBOT_LENGTH = 36;
 	
 	public static int WHEEL_DIAM = 4;
@@ -39,10 +39,13 @@ public final class Constants {
 	public static double GYRO_PID_I = 0.002;
 	public static double GYRO_PID_D = 0.009;*/
 	
-	public static double GYRO_PID_P = 0.021;
-	public static double GYRO_PID_I = 0.001;
-	public static double GYRO_PID_D = 0.0005;
+	/*public static double GYRO_PID_P = 0.0025; //0.021
+	public static double GYRO_PID_I = 0.000;
+	public static double GYRO_PID_D = 0.001;*/
 
+	public static double GYRO_PID_P = 0.025;
+	public static double GYRO_PID_I = 0.000;
+	public static double GYRO_PID_D = 0.125;
 	
 	public static int TURRET_ROTATION_TICKS = 29580;
 	public static int TURRET_ROTATION_DEG = 309;
@@ -139,7 +142,7 @@ public final class Constants {
 		LEFT_DRIVE.mode = CANTalon.TalonControlMode.PercentVbus;//CANTalon.TalonControlMode.Speed;
 		LEFT_DRIVE.invert = true;
 		LEFT_DRIVE.reverse_encoder = true; //reverse_encoder
-		LEFT_DRIVE.PID_F=-1*(1023*600)/(LEFT_DRIVE.target*4096); //PID_F
+		LEFT_DRIVE.PID_F=-0.3;//-1*(1023*600)/(LEFT_DRIVE.target*4096); //PID_F
 		/*LEFT_DRIVE.PID_P=0.0062; //PID_P
 		LEFT_DRIVE.PID_I=0.00000; //PID_I
 		LEFT_DRIVE.PID_D=0.0003; //PID_D*/
@@ -161,7 +164,7 @@ public final class Constants {
 		RIGHT_DRIVE.mode = CANTalon.TalonControlMode.PercentVbus;//CANTalon.TalonControlMode.Speed;
 		RIGHT_DRIVE.reverse_encoder = false; //reverse_encoder
 		RIGHT_DRIVE.invert = false;
-		RIGHT_DRIVE.PID_F=(1023*600)/(RIGHT_DRIVE.target*4096); //PID_F
+		RIGHT_DRIVE.PID_F=0.3;//(1023*600)/(RIGHT_DRIVE.target*4096); //PID_F
 		RIGHT_DRIVE.PID_P=0.008; //PID_P
 		RIGHT_DRIVE.PID_I=0.00000; //PID_I
 		RIGHT_DRIVE.PID_D=0.0003; //PID_D

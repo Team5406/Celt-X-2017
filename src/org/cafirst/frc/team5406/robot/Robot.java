@@ -103,6 +103,7 @@ public class Robot extends IterativeRobot {
     	autonomousSelector.addObject("12 - Middle Gear and Left Balls", new StraightGearBallLeftHopper(robotDrive, robotIntake, robotShooter));
 
 
+
     	
     	
     	calibrator = new Calibration(robotDrive, robotIntake, robotShooter);
@@ -123,6 +124,10 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		robotDrive.getPosition();
+
+		SmartDashboard.putNumber("Heading",Constants.navX.getYaw());
+
 		robotShooter.getLimitSwitches();
 
 		selectedRoutine.periodic();
@@ -145,6 +150,7 @@ public class Robot extends IterativeRobot {
 		robotShooter.stoppedPID();
 		robotClimber.DisplayCurrent();
 		robotShooter.DisplayCurrent();
+		robotDrive.getPosition();
 		teleopCounter++;
 		
 		if(CALIBRATION_MODE){

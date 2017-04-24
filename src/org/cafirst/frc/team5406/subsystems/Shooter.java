@@ -107,6 +107,7 @@ public class Shooter extends Subsystems{
 		//Starts and runs thread
 		thread.start();
 		
+		
 	}
 	
 	public void setTurretPID(double position){

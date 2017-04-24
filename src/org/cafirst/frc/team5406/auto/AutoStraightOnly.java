@@ -30,6 +30,8 @@ public class AutoStraightOnly  extends AutonomousRoutine{
 	
 	public void end(){
 		robotDrive.driveAtAngleEnd();
+		robotDrive.enableBrake(false);
+
 	}
 
 	public void periodic(){
