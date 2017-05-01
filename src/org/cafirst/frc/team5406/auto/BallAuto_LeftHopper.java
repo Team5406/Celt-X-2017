@@ -18,6 +18,7 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 	private boolean turretAligned = false;
 	private boolean readyToShoot = false;
 	private double rpm = 5900;
+	double turretInit = 0; 
 	
 
 
@@ -40,6 +41,7 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 		//robotShooter.alignTurret();
 		robotShooter.Shoot();
 		robotShooter.BallPump(-1);
+		turretInit = 0;
 		
 	}
 	
@@ -50,11 +52,10 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 
 	public void periodic(){
 		System.out.println("Auto Step (Straight Gear): " + autoStep);
-		double turretInit = 0; 
 		if (robotShooter.findTurretREVLimit() && turretInit == 0){
-			turretInit = robotShooter.turnTurretToDegree(-225);
-
+			turretInit = robotShooter.turnTurretToDegree(-262);
 		}
+		
 		
 		
 		
@@ -117,14 +118,16 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 				System.out.println(System.nanoTime() + " Aligning Turret");
 				turretAligned = true;
 			}else if (!robotShooter.centeringInProgress && !readyToShoot && turretAligned){
-				robotShooter.getDistance();
+				//robotShooter.getDistance();
 				System.out.println(System.nanoTime() + " Getting Distance");
 				rpm = robotShooter.getRPM();
 				readyToShoot = true;
+				System.out.println("TopRight: " + robotShooter.getImageTop() + ", RPM: " + rpm);
 			}
 			
 			if (readyToShoot){
 				System.out.println(System.nanoTime() + " Shooting");
+				
 				//robotShooter.getDistance();
 				//robotShooter.Shoot();
 				robotShooter.Shoot(rpm);

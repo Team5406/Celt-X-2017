@@ -56,7 +56,8 @@ public class Shooter extends Subsystems{
 	private double shooterRPMOffset = 0;
 	private double turretTarget = 0;
 	public double cameraOffset; //Set in RobotInit()
-
+	public boolean cameraFound = false;
+	public static boolean visionAvailable = false;
 
 	public Shooter(){
 
@@ -101,18 +102,33 @@ public class Shooter extends Subsystems{
 		//Instantiate items
 		gripPipeline = new GripPipeline();
 		listener = new VisionListener();
-		axisCamera = CameraServer.getInstance().addAxisCamera(Constants.AXIS_IP);
-		thread = new VisionThread(axisCamera, gripPipeline, listener);
-		
-		//Starts and runs thread
-		thread.start();
+		/*try{
+			axisCamera = CameraServer.getInstance().addAxisCamera(Constants.AXIS_IP);
+			cameraFound = true;
+		} catch (Exception e){
+			cameraFound = false;
+		}
+		if(cameraFound){
+			thread = new VisionThread(axisCamera, gripPipeline, listener);
+			thread.start();
+		}*/
+		try{		
+				axisCamera = CameraServer.getInstance().addAxisCamera(Constants.AXIS_IP);
+				thread = new VisionThread(axisCamera, gripPipeline, listener);
+				thread.start();
+				visionAvailable = true;
+		}catch (Exception e){
+			e.printStackTrace();
+			visionAvailable = false;
+		}
+
 		
 		
 	}
 	
 	public void setTurretPID(double position){
 		double amount = Math.abs(turretMotors[0].getPosition() - position);
-		/*if (amount > 0.1){
+		/*if (amount > 0.1){1
 			turretMotors[0].setProfile(1);
 		}else{*/
 			turretMotors[0].setProfile(0);
@@ -120,6 +136,8 @@ public class Shooter extends Subsystems{
 	}
 	
 	public void getLimitSwitches(){
+		SmartDashboard.putBoolean("Camera Connected", axisCamera.isConnected()); 
+
 		SmartDashboard.putBoolean("FWD Limit", turretMotors[0].isFwdLimitSwitchClosed());
 		SmartDashboard.putBoolean("REV Limit", turretMotors[0].isRevLimitSwitchClosed());
 	}
@@ -190,7 +208,7 @@ public class Shooter extends Subsystems{
 	}*/
 	
 	public void displayTurretPos(){
-		getDistance();
+		//getDistance();
  		double center = cameraOffset;
  		double centerOffset = center-Constants.centerX;
 		double degreeOffset = Constants.AXIS_FOV*(centerOffset/Constants.IMAGE_WIDTH);
@@ -209,9 +227,9 @@ public class Shooter extends Subsystems{
 		double rpm;
 		double current_offset=0;
  		Point topRight = listener.getTopRightPoint();
-		if(distance < 0.5){
+		/*if(distance < 0.5){
 			getDistance();
-		}
+		}*/
 		
 		if(Constants.IS_PRACTICE_BOT){
 			//rpm = 298.36*distance + 3180.6;
@@ -228,7 +246,8 @@ public class Shooter extends Subsystems{
 			//rpm = 0.1325*topRight.y*topRight.y-61.178*topRight.y+12078; //match 3 - too short
 			//rpm = 0.1135*topRight.y*topRight.y-47.642*topRight.y+9921.4; //last with auto changing distance
 			//rpm = 0.0975*topRight.y*topRight.y-38.543*topRight.y+8832.9; //21 balls auto
-			rpm = 0.0975*topRight.y*topRight.y-38.543*topRight.y+(8858 - 5);
+			//rpm = 0.0975*topRight.y*topRight.y-38.543*topRight.y+(8858 - 5); //district champs
+			rpm = 0.0972*topRight.y*topRight.y- 39.338*topRight.y+8965.1; //worlds
 		}
 		/*current_offset = indexerMotors[0].getOutputCurrent();
 		
@@ -252,7 +271,7 @@ public class Shooter extends Subsystems{
 		return topRight.y;
 	}
 	
-	public void getDistance(){
+	/*public void getDistance(){
  		Point topRight = listener.getTopRightPoint();
  		SmartDashboard.putNumber("topRight", topRight.y);
  		if(Constants.IS_PRACTICE_BOT){
@@ -261,7 +280,7 @@ public class Shooter extends Subsystems{
  		}else{
  		distance = 0.92*(0.8371*(0.00007*Math.pow(topRight.y, 2)-0.0002*(topRight.y)+2.5956)+0.6104);
  		}
-	}
+	}*/
 	
 	
 	public void BallPump(double rpm){
@@ -296,8 +315,12 @@ public class Shooter extends Subsystems{
 
 		
 		boolean turn = true;
-		boolean rev_limit = turretMotors[0].isRevLimitSwitchClosed();
-		boolean fwd_limit = turretMotors[0].isFwdLimitSwitchClosed();
+		
+		boolean rev_limit = (turretMotors[0].getFaultRevLim()==1);
+		boolean fwd_limit = (turretMotors[0].getFaultForLim()==1);
+		if(rev_limit || fwd_limit){
+			turretMotors[0].clearStickyFaults();
+		}
 		//clockwise is negative ticks; 29422 ticks for full motion
 		//clockwise hits reverse limit switch; counterclockwise hits forward limit switch
 		if(fwd_limit){
@@ -412,15 +435,16 @@ public class Shooter extends Subsystems{
 	public boolean findTurretREVLimit(){
 		System.out.println("REVLimitSearching : " + REVLimitSearching);
 		System.out.println("REVLimitFound : " + REVLimitFound);
-		if(!REVLimitSearching){
+		if(!REVLimitSearching && !REVLimitFound){
 		REVLimitTimer	 = new Timer();
 		REVLimitTimer.schedule(new findREVLimit(), 0L, 5L); //time in milliseconds
 		REVLimitSearching = true;
 		}
+		
 		return REVLimitFound;
 	}
 	
-	public double centerTurretIteration(){
+	/*public double centerTurretIteration(){
     	double turnTicks = 0;
     	if(listener.getFrameCount() !=lastFrame){
     		lastFrame = listener.getFrameCount();
@@ -451,7 +475,7 @@ public class Shooter extends Subsystems{
 		}else{
 	    	return 	300;
 		}
-	}
+	}*/
 	
 	class centerTurret extends TimerTask {
 		private int turretCenteringCounter = 0;
@@ -533,7 +557,7 @@ public class Shooter extends Subsystems{
 		            	System.out.println("Speed" + " " + Math.abs(turretMotors[0].getSpeed()));
 		            	System.out.println("ClosedLoopError" + " " + Math.abs(turretMotors[0].getClosedLoopError()));
 		    			//turretMotors[0].set(turretMotors[0].getPosition());
-		    			getDistance();
+		    			//getDistance();
 		            	System.out.println(System.nanoTime() + " " + turretCenteringCounter);
 		    			double center = cameraOffset;
 		    			System.out.println("Center" + center);

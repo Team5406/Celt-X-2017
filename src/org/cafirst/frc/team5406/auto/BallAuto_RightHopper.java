@@ -18,6 +18,8 @@ public class BallAuto_RightHopper  extends AutonomousRoutine{
 	private boolean turretAligned = false;
 	private boolean readyToShoot = false;
 	private double rpm = 5700;
+	double turretInit = 0;
+
 	
 
 
@@ -40,6 +42,7 @@ public class BallAuto_RightHopper  extends AutonomousRoutine{
 		//robotShooter.alignTurret();
 		robotShooter.Shoot();
 		robotShooter.BallPump(-1);
+		turretInit = 0;
 	}
 	
 	public void end(){
@@ -49,7 +52,6 @@ public class BallAuto_RightHopper  extends AutonomousRoutine{
 
 	public void periodic(){
 		System.out.println("Auto Step (Straight Gear): " + autoStep);
-		double turretInit = 0;
 		if (robotShooter.findTurretREVLimit() && turretInit == 0){
 				turretInit = robotShooter.turnTurretToDegree(-60);
 			
@@ -62,10 +64,10 @@ public class BallAuto_RightHopper  extends AutonomousRoutine{
 		case 0:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (0) " + direction*robotPosition[0]);
-			if( direction*robotPosition[0] > ((113-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( direction*robotPosition[0] > ((117-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(0.0, 90.0, true);
 				autoStep = 1;
-			} else if( direction*robotPosition[0] > ((108-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( direction*robotPosition[0] > ((109-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(200, 90.0, true);
 			} else if( direction*robotPosition[0] > ((93-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 						robotDrive.driveAtAngleUpdate(400, 90.0, true);
@@ -80,7 +82,7 @@ public class BallAuto_RightHopper  extends AutonomousRoutine{
 				robotShooter.alignTurret();
 				turretAligned = true;
 			}else if (!robotShooter.centeringInProgress && !readyToShoot && turretAligned){
-				robotShooter.getDistance();
+				//robotShooter.getDistance();
 				rpm = robotShooter.getRPM();
 				System.out.println("TopRight: " + robotShooter.getImageTop() + ", RPM: " + rpm);
 				readyToShoot = true;

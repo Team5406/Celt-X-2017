@@ -18,7 +18,8 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 	private boolean done_before = false;
 	private boolean readyToShoot = false;
 	private double rpm = 5000;
-	
+	double turretInit = 0;
+
 
 
 	public StraightGearBallLeftHopper(Drive _robotDrive, Intake _robotIntake, Shooter _robotShooter){
@@ -38,6 +39,7 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 		robotDrive.driveAtAngleInit(300, 0.0, true);
 		direction = (Constants.IS_PRACTICE_BOT?1:-1);
 		//robotShooter.alignTurret();
+		turretInit = 0;
 	}
 	
 	public void end(){
@@ -47,7 +49,6 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 
 	public void periodic(){
 		System.out.println("Auto Step (Straight Gear): " + autoStep);
-		double turretInit = 0;
 		if (robotShooter.findTurretREVLimit() && turretInit == 0){
 			turretInit = robotShooter.turnTurretToDegree(-122);
 			System.out.println("TurretInit: " + turretInit);
@@ -120,7 +121,7 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 				robotShooter.alignTurret();
 				done_before = true;
 			}else if (!robotShooter.centeringInProgress && !readyToShoot && done_before){
-				robotShooter.getDistance();
+				//robotShooter.getDistance();
 				rpm = robotShooter.getRPM();
 				readyToShoot = true;
 			}else if (readyToShoot){

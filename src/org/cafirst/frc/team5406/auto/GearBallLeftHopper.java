@@ -23,6 +23,8 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 	private double[] robotDistance = {0,0};
 	
 	private double[] angles = {0,0,0,0};
+	double turretInit = 0;
+
 
 
 
@@ -43,6 +45,7 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 		direction = (Constants.IS_PRACTICE_BOT?1:-1);
 		angles[0] = Constants.navX.getYaw();
 		robotDrive.setVolageRampRate(75);
+		turretInit = 0;
 		
 	}
 	
@@ -56,7 +59,6 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 
 	public void periodic(){
 		System.out.println("Step: " + autoStep + " 0: " +  angles[0]+ " 1: " +  angles[1]+ " 2: " +  angles[2]+ " 3: " +  angles[3] + " current: " + Constants.navX.getYaw());
-		double turretInit = 0;
 		if (robotShooter.findTurretREVLimit() && turretInit == 0){
 			turretInit = robotShooter.turnTurretToDegree(-262);
 		}
@@ -71,7 +73,7 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 		switch (autoStep){
 
 		case 0:
-			if( Math.abs(direction*robotDistance[1]) > ((35.5)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( Math.abs(direction*robotDistance[1]) > ((28.5)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAlongCurveInit(300, 48, 55, 4);
 				autoStep = 1;
 				angles[1] = Constants.navX.getYaw();
@@ -89,12 +91,12 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 			}
 			break;
 		case 2:
-			if( Math.abs(direction*robotDistance[1]) > ((34)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( Math.abs(direction*robotDistance[1]) > ((55)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotIntake.dropGear(false);
 				robotDrive.driveAtAngleUpdate(0, 60, true);
 				autoStep = 3;
 				angles[3] = Constants.navX.getYaw();
-			} else if( Math.abs(direction*robotDistance[1]) > ((22)/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( Math.abs(direction*robotDistance[1]) > ((39)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(150, 60, true);
 			}
 			break;
@@ -153,11 +155,11 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 			}
 			break;
 		case 8:
-			if(Math.abs(direction*robotDistance[1]) > (19/(Constants.WHEEL_DIAM*Math.PI))){
+			if(Math.abs(direction*robotDistance[1]) > (23/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 9;
             	robotDrive.driveAtAngleUpdate(0.0, -90.0, true);
             	robotDrive.driveAtAngleEnd();
-			}else if(Math.abs(direction*robotDistance[1]) > (15/(Constants.WHEEL_DIAM*Math.PI))){
+			}else if(Math.abs(direction*robotDistance[1]) > (18/(Constants.WHEEL_DIAM*Math.PI))){
             	robotDrive.driveAtAngleUpdate(200, -90.0, true);
 			}
 
@@ -168,10 +170,10 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 				robotShooter.alignTurret();
 				done_before = true;
 			}else if (!robotShooter.centeringInProgress && !readyToShoot && done_before){
-				robotShooter.getDistance();
+				//robotShooter.getDistance();
 				readyToShoot = true;
 			}else if (readyToShoot){
-				robotShooter.getDistance();
+				//robotShooter.getDistance();
 				robotShooter.Shoot();
 				robotShooter.Indexer(Constants.INDEXER_SPEED);				
 			}

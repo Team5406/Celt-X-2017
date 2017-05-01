@@ -60,7 +60,7 @@ public class AutoRightGearLeftBoiler  extends AutonomousRoutine{
 		switch (autoStep){
 
 		case 0:
-			if( Math.abs(direction*robotDistance[1]) > ((41)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( Math.abs(direction*robotDistance[1]) > ((45)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAlongCurveInit(300, 48, -55, 8);
 				autoStep = 1;
 				angles[1] = Constants.navX.getYaw();
@@ -77,12 +77,12 @@ public class AutoRightGearLeftBoiler  extends AutonomousRoutine{
 			}
 			break;
 		case 2:
-			if( Math.abs(direction*robotDistance[1]) > ((28)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( Math.abs(direction*robotDistance[1]) > ((37)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotIntake.dropGear(false);
 				robotDrive.driveAtAngleUpdate(0, -60, true);
 				autoStep = 3;
 				angles[3] = Constants.navX.getYaw();
-			} else if( Math.abs(direction*robotDistance[1]) > ((12)/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( Math.abs(direction*robotDistance[1]) > ((18)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(150, -60, true);
 			}
 			break;
@@ -106,7 +106,7 @@ public class AutoRightGearLeftBoiler  extends AutonomousRoutine{
 			break;
 		case 4:
 			robotDrive.driveAtAngleUpdate(-200, -60.0, true);
-			if(Math.abs(direction*robotDistance[1]) > (24/(Constants.WHEEL_DIAM*Math.PI))){
+			if(Math.abs(direction*robotDistance[1]) > (34/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 5;
 				robotIntake.liftGear();
 				robotIntake.StopIntake();

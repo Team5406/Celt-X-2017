@@ -88,7 +88,7 @@ public class Calibration{
 				robotShooter.alignTurret();
 			} while(robotShooter.centeringInProgress);
 		}else{
-			robotShooter.getDistance();
+			//robotShooter.getDistance();
 			RPM = robotShooter.getRPM();
 			turretTarget = robotShooter.turretPosition();
 		}

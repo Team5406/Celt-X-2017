@@ -106,7 +106,7 @@ public class AutoLeftGearRightBoiler  extends AutonomousRoutine{
 			break;
 		case 4:
 			robotDrive.driveAtAngleUpdate(-200, 60.0, true);
-			if(Math.abs(direction*robotDistance[1]) > (24/(Constants.WHEEL_DIAM*Math.PI))){
+			if(Math.abs(direction*robotDistance[1]) > (34/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 5;
 				robotIntake.liftGear();
 				robotIntake.StopIntake();

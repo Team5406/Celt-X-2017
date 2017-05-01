@@ -80,7 +80,7 @@ public class Robot extends IterativeRobot {
 		
 		SmartDashboard.putNumber("Rand", Math.random());
 		
-		robotShooter.cameraOffset = (Constants.IS_PRACTICE_BOT?220:275);
+		robotShooter.cameraOffset = (Constants.IS_PRACTICE_BOT?220:270);
 
 		selectedRoutine = new DoNothing();
     	
