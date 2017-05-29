@@ -1,102 +1,115 @@
 package org.cafirst.frc.team5406.auto;
 
-import org.cafirst.frc.team5406.robot.Constants;
-import org.cafirst.frc.team5406.subsystems.Drive;
-import org.cafirst.frc.team5406.subsystems.Intake;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import org.cafirst.frc.team5406.subsystem.Drive;
+import org.cafirst.frc.team5406.subsystem.Intake;
+import org.cafirst.frc.team5406.util.Constants;
 
-
-public class AutoRightGearRightBoiler  extends AutonomousRoutine{
-	private Intake robotIntake;
+public class AutoRightGearRightBoiler extends AutonomousRoutine{
+	
 	private Drive robotDrive;
-	private int autoStep = 0;
-	private boolean gearDelay = false;
+	private Intake robotIntake;
+	
+	private int autoStep;
+	
+	private int direction;
+	
 	private double[] robotPosition;
-	private int direction = 1;
-	private boolean turretAligned = false;
-	private boolean readyToShoot = false;
-	private double rpm = 5900;
-	private double[] startPos = {0,0};
-	private double[] robotDistance = {0,0};
+	private double[] startPosition;
+	private double[] robotDistances = {0, 0};
+	private double[] robotAngles = {0,0,0,0};
 	
-	private double[] angles = {0,0,0,0};
-
-	private boolean init = false;
-
-
-	public AutoRightGearRightBoiler(Drive _robotDrive, Intake _robotIntake){
+	private boolean gearDelay;
+	
+	/**
+	 * Constructor for Right Gear Right Boiler Auto
+	 * @param robotDrive The Robot Drive System
+	 * @param robotIntake The Robot Intake System
+	 */
+	public AutoRightGearRightBoiler(Drive robotDrive, Intake robotIntake)
+	{
 		super("9 - Right Gear (Right Boiler)");
-		robotDrive = _robotDrive;
-		robotIntake = _robotIntake;
-	
+		
+		this.robotDrive = robotDrive;
+		this.robotIntake = robotIntake;
 	}
 	
-	public void init(){
-		Constants.navX.zeroYaw();
-		startPos = robotDrive.getPosition();
-		autoStep =0;
+	@Override
+	public void init()
+	{
+		autoStep = 0;
+		direction = (Constants.IS_PRACTICE_BOT ? 1 : -1);
+		
 		gearDelay = false;
-		robotDrive.driveAtAngleInit(250, 0.0, true);
-		direction = (Constants.IS_PRACTICE_BOT?1:-1);
-		angles[0] = Constants.navX.getYaw();
 		
+		startPosition = robotDrive.getPosition();
+		
+		Constants.navX.zeroYaw();
+		robotAngles[0] = Constants.navX.getYaw();
+		
+		robotDrive.driveAtAngleStart(250, 0.0, true);
 	}
 	
-	public void end(){
-		robotDrive.enableBrake(false);
-		robotDrive.driveAlongCurveEnd();
-		robotDrive.driveAtAngleEnd();
-	}
-
-	public void periodic(){
-		System.out.println("Step: " + autoStep + " 0: " +  angles[0]+ " 1: " +  angles[1]+ " 2: " +  angles[2]+ " 3: " +  angles[3] + " current: " + Constants.navX.getYaw());
+	@Override
+	public void periodic()
+	{
 		robotPosition = robotDrive.getPosition();
-		robotDistance[0] = startPos[0]-robotPosition[0];
-		robotDistance[1] = startPos[1]-robotPosition[1];
 		
-
-		System.out.println("Left Pos: " + robotDistance[0] + ", Right Pos: " + robotDistance[1]);
-
-		switch (autoStep){
-
+		robotDistances[0] = startPosition[0] - robotPosition[0];
+		robotDistances[1] = startPosition[1] - robotPosition[1];
+		
+		switch(autoStep)
+		{
 		case 0:
-			if( Math.abs(direction*robotDistance[1]) > ((41)/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAlongCurveInit(300, 48, -60, 8);
+			if(Math.abs(direction * robotDistances[1]) > ((41) / (Constants.WHEEL_DIAM * Math.PI)))
+			{
+				robotDrive.driveAtCurveStart(300, 48, -60, 8);
+				robotAngles[1] = Constants.navX.getYaw();
+				
 				autoStep = 1;
-				angles[1] = Constants.navX.getYaw();
-
 			}
 			break;
+			
 		case 1:
-			if(robotDrive.driveAlongCurveCompleted()){
-				robotDrive.driveAlongCurveEnd();
+			if(robotDrive.isCurveCompleted())
+			{
+				robotDrive.driveAtCurveEnd();
 				robotDrive.driveAtAngleUpdate(300, -60, true);
-
-				startPos = robotPosition;
+				
+				startPosition = robotPosition;
+				robotAngles[2] = Constants.navX.getYaw();
+				
 				autoStep = 2;
-				angles[2] = Constants.navX.getYaw();
 			}
 			break;
+			
 		case 2:
-			if( Math.abs(direction*robotDistance[1]) > ((32)/(Constants.WHEEL_DIAM*Math.PI))){
+			if(Math.abs(direction * robotDistances[1]) > ((32) / (Constants.WHEEL_DIAM * Math.PI)))
+			{
 				robotIntake.dropGear(false);
 				robotDrive.driveAtAngleUpdate(0, -60, true);
+				
+				robotAngles[3] = Constants.navX.getYaw();
+				
 				autoStep = 3;
-				angles[3] = Constants.navX.getYaw();
-			} else if( Math.abs(direction*robotDistance[1]) > ((16)/(Constants.WHEEL_DIAM*Math.PI))){
+			} 
+			else if(Math.abs(direction * robotDistances[1]) > ((16) / (Constants.WHEEL_DIAM * Math.PI)))
 				robotDrive.driveAtAngleUpdate(150, -60, true);
-			}
+				
 			break;
+			
 		case 3:
-			if (!gearDelay){
+			if(!gearDelay){
 				gearDelay = true;
 				robotDrive.driveAtAngleUpdate(0.0, -60.0, false);
-		    	new java.util.Timer().schedule( 
-		    			new java.util.TimerTask() {
+		    	new Timer().schedule( 
+		    			new TimerTask() {
 		    	            @Override
 		    	            public void run() {
 		    	            	autoStep = 4;
-		    	            	startPos = robotPosition;
+		    	            	startPosition = robotPosition;
 		    	            	robotDrive.driveAtAngleUpdate(-200, -60.0, true);
 		    	            	this.cancel();
 		    	            }
@@ -105,17 +118,31 @@ public class AutoRightGearRightBoiler  extends AutonomousRoutine{
 		    	);
 			}
 			break;
+			
 		case 4:
 			robotDrive.driveAtAngleUpdate(-200, -60.0, true);
-			if(Math.abs(direction*robotDistance[1]) > (24/(Constants.WHEEL_DIAM*Math.PI))){
-				autoStep = 5;
+			if(Math.abs(direction * robotDistances[1]) > (24 / (Constants.WHEEL_DIAM * Math.PI)))
+			{
 				robotIntake.liftGear();
-				robotIntake.StopIntake();
+				robotIntake.stopIntake();
 				robotDrive.driveAtAngleEnd();
+				
+				autoStep = 5;
 			}
 			break;
-		
 		}
 	}
+	
+	@Override
+	public void end()
+	{
+		robotDrive.toggleBrakeMode(false);
+		robotDrive.driveAtCurveEnd();
+		robotDrive.driveAtAngleEnd();
+	}
+	
+	@Override
+	public AutonomousRoutine newInstance() {
+		return new AutoRightGearRightBoiler(robotDrive, robotIntake);
+	}
 }
-
