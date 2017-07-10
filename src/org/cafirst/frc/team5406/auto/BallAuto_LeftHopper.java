@@ -17,6 +17,7 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 	private int direction = 1;
 	private boolean turretAligned = false;
 	private boolean readyToShoot = false;
+	private boolean spinBackwards = true;
 	private double rpm = 5900;
 	double turretInit = 0; 
 	
@@ -39,8 +40,7 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 		robotDrive.driveAtAngleInit(400, 0.0, true);
 		direction = (Constants.IS_PRACTICE_BOT?1:-1);
 		//robotShooter.alignTurret();
-		robotShooter.Shoot();
-		robotShooter.BallPump(-1);
+
 		turretInit = 0;
 		
 	}
@@ -53,7 +53,7 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 	public void periodic(){
 		System.out.println("Auto Step (Straight Gear): " + autoStep);
 		if (robotShooter.findTurretREVLimit() && turretInit == 0){
-			turretInit = robotShooter.turnTurretToDegree(-262);
+			turretInit = robotShooter.turnTurretToDegree(-268);
 		}
 		
 		
@@ -64,16 +64,18 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 		case 0:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (0) " + direction*robotPosition[1]);
-			if( direction*robotPosition[1] > ((114-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAtAngleUpdate(0.0, -90.0, true);
+			if( direction*robotPosition[1] > ((112-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(90, -90.0, true);
             	robotDrive.resetPosition();
 				autoStep = 1;
-			} else if( direction*robotPosition[1] > ((109-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( direction*robotPosition[1] > ((107-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(200, -90.0, true);
-			} else if( direction*robotPosition[1] > ((94-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( direction*robotPosition[1] > ((92-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(400, -90.0, true);
-			}else if ( direction*robotPosition[1] > ((73-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
+			}else if ( direction*robotPosition[1] > ((71-Constants.ROBOT_LENGTH)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(400, -45.0, true);
+				robotShooter.Shoot();
+				robotShooter.BallPump(1);
 				robotIntake.IntakeBalls(50);
 			}
 			break;
@@ -90,7 +92,7 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 		    					this.cancel();
 		    	            }
 		    	        }, 
-		    	        1000 
+		    	        250 
 		    	);
 			}
 			
@@ -128,8 +130,7 @@ public class BallAuto_LeftHopper  extends AutonomousRoutine{
 			if (readyToShoot){
 				System.out.println(System.nanoTime() + " Shooting");
 				
-				//robotShooter.getDistance();
-				//robotShooter.Shoot();
+				robotShooter.BallPump(-1);
 				robotShooter.Shoot(rpm);
 				robotShooter.Indexer(Constants.INDEXER_SPEED);				
 			}

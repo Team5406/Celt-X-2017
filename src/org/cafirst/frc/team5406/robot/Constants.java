@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.SPI;
 import com.kauailabs.navx.frc.AHRS;
 
 public final class Constants {
+	public static boolean auto = false;
 	
 	public static AHRS navX = new AHRS(SPI.Port.kMXP);
 	
@@ -43,7 +44,7 @@ public final class Constants {
 	public static double GYRO_PID_I = 0.000;
 	public static double GYRO_PID_D = 0.001;*/
 
-	public static double GYRO_PID_P = 0.025;
+	public static double GYRO_PID_P = 0.022;
 	public static double GYRO_PID_I = 0.000;
 	public static double GYRO_PID_D = 0.125;
 	
@@ -63,7 +64,7 @@ public final class Constants {
 	public static double CAMERA_FIELD = Math.PI/3;
 	public static double CAMERA_FIELD_HALF = CAMERA_FIELD/2;
 	
-	public static int INDEXER_SPEED = 900;
+	public static int INDEXER_SPEED = 1100;
 	
 
 	

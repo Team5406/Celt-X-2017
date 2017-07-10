@@ -1,6 +1,7 @@
 package org.cafirst.frc.team5406.auto;
 
 import org.cafirst.frc.team5406.robot.Constants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.cafirst.frc.team5406.subsystems.Drive;
 import org.cafirst.frc.team5406.subsystems.Intake;
 import org.cafirst.frc.team5406.subsystems.Shooter;
@@ -13,6 +14,7 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 	private Shooter robotShooter;
 	private int autoStep = 0;
 	private boolean gearDelay = false;
+	private boolean bounceDelay = false;
 	private double[] robotPosition;
 	private int direction = 1;
 	private boolean turretAligned = false;
@@ -60,8 +62,10 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 	public void periodic(){
 		System.out.println("Step: " + autoStep + " 0: " +  angles[0]+ " 1: " +  angles[1]+ " 2: " +  angles[2]+ " 3: " +  angles[3] + " current: " + Constants.navX.getYaw());
 		if (robotShooter.findTurretREVLimit() && turretInit == 0){
-			turretInit = robotShooter.turnTurretToDegree(-262);
+			turretInit = robotShooter.turnTurretToDegree(-268);
 		}
+		SmartDashboard.putNumber("DriveAngle", Constants.navX.getYaw());
+
 		
 		robotPosition = robotDrive.getPosition();
 		robotDistance[0] = startPos[0]-robotPosition[0];
@@ -73,8 +77,8 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 		switch (autoStep){
 
 		case 0:
-			if( Math.abs(direction*robotDistance[1]) > ((28.5)/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAlongCurveInit(300, 48, 55, 4);
+			if( Math.abs(direction*robotDistance[1]) > ((34)/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAlongCurveInit(250, 48, 45, 2);
 				autoStep = 1;
 				angles[1] = Constants.navX.getYaw();
 
@@ -83,24 +87,31 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 		case 1:
 			if(robotDrive.driveAlongCurveCompleted()){
 				robotDrive.driveAlongCurveEnd();
-				robotDrive.driveAtAngleUpdate(300, 60, true);
-
-				startPos = robotPosition;
+				robotDrive.driveAlongCurveInit(250, 48, 60, 0);
 				autoStep = 2;
-				angles[2] = Constants.navX.getYaw();
 			}
 			break;
 		case 2:
-			if( Math.abs(direction*robotDistance[1]) > ((55)/(Constants.WHEEL_DIAM*Math.PI))){
-				robotIntake.dropGear(false);
-				robotDrive.driveAtAngleUpdate(0, 60, true);
+			if(robotDrive.driveAlongCurveCompleted()){
+				robotDrive.driveAlongCurveEnd();
+				robotDrive.driveAtAngleUpdate(250, 60, true);
+
+				startPos = robotPosition;
 				autoStep = 3;
-				angles[3] = Constants.navX.getYaw();
-			} else if( Math.abs(direction*robotDistance[1]) > ((39)/(Constants.WHEEL_DIAM*Math.PI))){
-				robotDrive.driveAtAngleUpdate(150, 60, true);
+				angles[2] = Constants.navX.getYaw();
 			}
 			break;
 		case 3:
+			if( Math.abs(direction*robotDistance[1]) > ((41)/(Constants.WHEEL_DIAM*Math.PI))){
+				robotIntake.dropGear(false);
+				robotDrive.driveAtAngleUpdate(0, 60, true);
+				autoStep = 4;
+				angles[3] = Constants.navX.getYaw();
+			} else if( Math.abs(direction*robotDistance[1]) > ((30)/(Constants.WHEEL_DIAM*Math.PI))){
+				robotDrive.driveAtAngleUpdate(150, 60, true);
+			}
+			break;
+		case 4:
 			if (!gearDelay){
 				gearDelay = true;
 				robotDrive.driveAtAngleUpdate(0.0, 60.0, true);
@@ -109,7 +120,7 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 		    			new java.util.TimerTask() {
 		    	            @Override
 		    	            public void run() {
-		    	            	autoStep = 4;
+		    	            	autoStep = 5;
 		    	            	startPos = robotPosition;
 		    	            	robotDrive.driveAtAngleUpdate(-400, 60.0, true);
 		    	            	this.cancel();
@@ -119,63 +130,96 @@ public class GearBallLeftHopper  extends AutonomousRoutine{
 		    	);
 			}
 			break;
-		case 4:
-			robotDrive.driveAtAngleUpdate(-200, 60.0, true);
-			if(Math.abs(direction*robotDistance[1]) > (15/(Constants.WHEEL_DIAM*Math.PI))){
-				autoStep = 5;
-				robotIntake.liftGear();
-				robotDrive.driveAlongCurveInit(-400, 30, 5, 4);
-			}
-			break;
 		case 5:
-			if(robotDrive.driveAlongCurveCompleted()){
-				robotDrive.driveAlongCurveEnd();
-            	robotDrive.driveAtAngleUpdate(-400, 0.0, true);
-            	startPos = robotPosition;
+			robotDrive.driveAtAngleUpdate(-200, 60.0, true);
+			if(Math.abs(direction*robotDistance[1]) > (12/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 6;
+				robotIntake.liftGear();
+				robotDrive.driveAlongCurveInit(-400, 35, 20, 2);
 			}
 			break;
 		case 6:
-			if(Math.abs(direction*robotDistance[1]) > (19/(Constants.WHEEL_DIAM*Math.PI))){
+			if(robotDrive.driveAlongCurveCompleted()){
+				robotDrive.driveAlongCurveEnd();
+				robotDrive.driveAlongCurveInit(-200, 35, 0, 0);
 				autoStep = 7;
-				robotDrive.driveAlongCurveInit(400, 30, -80, 4);
-			}else if(Math.abs(direction*robotDistance[1]) > (12/(Constants.WHEEL_DIAM*Math.PI))){
-            	robotDrive.driveAtAngleUpdate(-100, 0.0, true);
 			}
 			break;
 		case 7:
 			if(robotDrive.driveAlongCurveCompleted()){
 				robotDrive.driveAlongCurveEnd();
-            	robotDrive.driveAtAngleUpdate(400, -90.0, true);
-				robotShooter.Shoot();
-				robotShooter.BallPump(-1);
-				robotIntake.IntakeBalls(50);
+            	robotDrive.driveAtAngleUpdate(-350, 0.0, true);
             	startPos = robotPosition;
 				autoStep = 8;
 			}
 			break;
 		case 8:
-			if(Math.abs(direction*robotDistance[1]) > (23/(Constants.WHEEL_DIAM*Math.PI))){
+			if(Math.abs(direction*robotDistance[1]) > (18/(Constants.WHEEL_DIAM*Math.PI))){
 				autoStep = 9;
-            	robotDrive.driveAtAngleUpdate(0.0, -90.0, true);
-            	robotDrive.driveAtAngleEnd();
-			}else if(Math.abs(direction*robotDistance[1]) > (18/(Constants.WHEEL_DIAM*Math.PI))){
-            	robotDrive.driveAtAngleUpdate(200, -90.0, true);
+            	//robotDrive.driveAtAngleUpdate(0, 0.0, true);
+				robotDrive.driveAlongCurveInit(350, 35, -60, 2);
+			}else if(Math.abs(direction*robotDistance[1]) > (8/(Constants.WHEEL_DIAM*Math.PI))){
+            	robotDrive.driveAtAngleUpdate(-200, 0.0, true);
 			}
-
 			break;
 		case 9:
+			if(robotDrive.driveAlongCurveCompleted()){
+				robotDrive.driveAlongCurveEnd();
+				robotDrive.driveAlongCurveInit(200, 35, -90, 0);
+				autoStep = 10;
+			}
+			break;
+		case 10:
+			if(robotDrive.driveAlongCurveCompleted()){
+            	//robotDrive.driveAtAngleUpdate(-20, Constants.navX.getYaw(), true);
+				robotDrive.driveAlongCurveEnd();
+				robotDrive.driveAtAngleUpdate(200, -90.0, true);
+				robotShooter.Shoot();
+				robotShooter.BallPump(-1);
+				robotIntake.IntakeBalls(50);
+            	startPos = robotPosition;
+				autoStep = 11;
+			}
+			break;		
+		case 11:
+			if(Math.abs(direction*robotDistance[1]) > (2/(Constants.WHEEL_DIAM*Math.PI))){
+            	robotDrive.driveAtAngleUpdate(90, -90.0, true);
+				autoStep = 12;
+			}
+			break;
+		case 12:
+			if (!bounceDelay){
+				bounceDelay = true;
+		    	new java.util.Timer().schedule( 
+		    			new java.util.TimerTask() {
+		    	            @Override
+		    	            public void run() {
+		    	            	autoStep = 13;
+		    	            	robotDrive.resetPosition();
+		    					robotDrive.driveAtAngleUpdate(0, -90.0, true);
+		    					this.cancel();
+		    	            }
+		    	        }, 
+		    	        250 
+		    	);
+			}
+			break;
+
+		case 13:
+			robotDrive.driveAtAngleUpdate(0, -90.0, true);
 			robotDrive.driveAtAngleEnd();
 			if(!done_before && turretInit ==1){
 				robotShooter.alignTurret();
 				done_before = true;
 			}else if (!robotShooter.centeringInProgress && !readyToShoot && done_before){
 				//robotShooter.getDistance();
+				rpm = robotShooter.getRPM();
 				readyToShoot = true;
 			}else if (readyToShoot){
 				//robotShooter.getDistance();
-				robotShooter.Shoot();
-				robotShooter.Indexer(Constants.INDEXER_SPEED);				
+				robotShooter.BallPump(-1);
+				robotShooter.Shoot(rpm);
+				robotShooter.Indexer(Constants.INDEXER_SPEED);	
 			}
 			break;
 

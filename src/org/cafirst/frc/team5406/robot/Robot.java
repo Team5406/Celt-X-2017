@@ -80,7 +80,7 @@ public class Robot extends IterativeRobot {
 		
 		SmartDashboard.putNumber("Rand", Math.random());
 		
-		robotShooter.cameraOffset = (Constants.IS_PRACTICE_BOT?220:270);
+		robotShooter.cameraOffset = (Constants.IS_PRACTICE_BOT?220:265);
 
 		selectedRoutine = new DoNothing();
     	
@@ -115,6 +115,7 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void autonomousInit() {
+		Constants.auto = true;
 		SmartDashboard.putString("Robot Status", "Auto");
 		selectedRoutine.init();
 	}
@@ -135,6 +136,7 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopInit() {
+		Constants.auto = false;
 		selectedRoutine.end();
 		SmartDashboard.putString("Robot Status", "Teleop");
 		robotClimber.direction_switch = false;
@@ -425,6 +427,7 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void disabledInit() {
+		Constants.auto = false;
 		selectedRoutine.end();
 		robotDrive.driveAtAngleEnd();
 		robotShooter.stopTimer();

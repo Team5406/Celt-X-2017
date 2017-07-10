@@ -134,7 +134,7 @@ public class Drive extends Subsystems{
 		System.out.println("CurveInit");
 		curveTimer = new Timer();
 		dcMon = new driveCurveMonitor(_speed,_radius,_targetAngle, _coastDistance);
-	    curveTimer.schedule(dcMon, 0L, 5L); //time in milliseconds
+	    curveTimer.schedule(dcMon, 0L, 2L); //time in milliseconds
 
 	}
 	
@@ -219,6 +219,8 @@ public class Drive extends Subsystems{
 			setAngle = startAngle + dAngle*percentCurve; //the angle we should be at at this point along the path length
 
 		}
+		setAngle = startAngle + dAngle*percentCurve; //the angle we should be at at this point along the path length
+
 		System.out.println(percentDone + "%   lPos: " + robotPosition[0] + ", rPos: " + robotPosition[1] + ", Current Angle: " + Constants.navX.getYaw() + "Set Angle: " + setAngle + ", start: " + start +", %Coast: " + startCurvePercent + ", %Curve: " + percentCurve);
 		System.out.println("pathLength: " + pathLength +", dAngle: " + dAngle + ", targetAngle: " + targetAngle + ", ffSpeedOffset: " + ffSpeedOffset + ", robotPositionAvg: " + robotPositionAvg);
 		anglePID.updateValues(_speed, setAngle, true, ffSpeedOffset); //calls driveAtAngle to match our new target
@@ -287,6 +289,8 @@ public class Drive extends Subsystems{
 		double speedChangeMultiplier = 0;
 		if(correct){
 			System.out.println("Angle: " + angle + ", currentAngle: " + currentAngle);
+			SmartDashboard.putNumber("DriveAngleRes", angle - currentAngle);
+
 
 		speedChangeMultiplier = calcSpeed(angle - currentAngle);
 		System.out.println("SpeedChangeMultiplier: " + speedChangeMultiplier);

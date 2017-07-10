@@ -247,7 +247,9 @@ public class Shooter extends Subsystems{
 			//rpm = 0.1135*topRight.y*topRight.y-47.642*topRight.y+9921.4; //last with auto changing distance
 			//rpm = 0.0975*topRight.y*topRight.y-38.543*topRight.y+8832.9; //21 balls auto
 			//rpm = 0.0975*topRight.y*topRight.y-38.543*topRight.y+(8858 - 5); //district champs
-			rpm = 0.0972*topRight.y*topRight.y- 39.338*topRight.y+8965.1; //worlds
+			//rpm = 0.0972*topRight.y*topRight.y- 39.338*topRight.y+8965.1; //worlds
+			rpm = 0.0786*topRight.y*topRight.y- 31.386*topRight.y+8103.1 + 100; //iri
+			
 		}
 		/*current_offset = indexerMotors[0].getOutputCurrent();
 		
@@ -589,7 +591,9 @@ public class Shooter extends Subsystems{
 	    			centeringTurret.purge();
 	    		}
 	
-	    	}else{
+			}else if(Constants.auto){
+				
+			}else{
 	    		System.out.println("Search Else... Err: " + turretMotors[0].getClosedLoopError() + ", Speed: " + turretMotors[0].getSpeed());
 	    		if(Math.abs(turretMotors[0].getSpeed()) < 5){
 	    			turnTicks = autoTurretDirection *1;
