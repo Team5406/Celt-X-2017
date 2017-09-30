@@ -51,7 +51,8 @@ public final class Constants {
 	public static int TURRET_ROTATION_TICKS = 29580;
 	public static int TURRET_ROTATION_DEG = 309;
 	public static int AXIS_FOV = 63;
-	public static double CAMERA_OFFSET = 2.5;
+	public static double CAMERA_LEFT_OFFSET = 273;//270;//288;
+	public static double CAMERA_RIGHT_OFFSET = 263;//255;//268;
 
 	
 	public static String AXIS_IP = "10.54.6.17";
@@ -106,9 +107,11 @@ public final class Constants {
 	public static int CCW_LIMIT_SWITCH = 0;
 	public static int CW_LIMIT_SWITCH = 1;
 	public static int GEAR_SWITCH = 2;
-	public static int GEAR_LIGHT = 4;
 	public static int PRACTICE_BOT = 9; //jumper to short pins on practice bot
 	
+	//PWM Ports
+	public static int GEAR_LIGHT = 4;
+	public static int HOPPER_FLAP = 3;
 	
 	public boolean equalsDeadband(double value){
 	return ((-1*xboxControllerDeadband) < value && value < xboxControllerDeadband);

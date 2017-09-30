@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.Servo;
 
 
 
@@ -66,7 +67,7 @@ public class Robot extends IterativeRobot {
 	private long teleopCounter = 0;
 	private double rpm = 5800;
 	private boolean setRPM = false;
-
+	private Servo hopperFlap = new Servo(Constants.HOPPER_FLAP);
 
 
 
@@ -80,7 +81,7 @@ public class Robot extends IterativeRobot {
 		
 		SmartDashboard.putNumber("Rand", Math.random());
 		
-		robotShooter.cameraOffset = (Constants.IS_PRACTICE_BOT?220:265);
+		robotShooter.cameraOffset = (Constants.IS_PRACTICE_BOT?220:272);
 
 		selectedRoutine = new DoNothing();
     	
@@ -116,6 +117,8 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		Constants.auto = true;
+		hopperFlap.setAngle(0);
+
 		SmartDashboard.putString("Robot Status", "Auto");
 		selectedRoutine.init();
 	}
@@ -137,6 +140,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopInit() {
 		Constants.auto = false;
+		hopperFlap.setAngle(0);
 		selectedRoutine.end();
 		SmartDashboard.putString("Robot Status", "Teleop");
 		robotClimber.direction_switch = false;

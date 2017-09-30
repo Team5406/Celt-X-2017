@@ -27,6 +27,7 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 		robotDrive = _robotDrive;
 		robotIntake = _robotIntake;
 		robotShooter = _robotShooter;
+
 	
 	}
 	
@@ -40,10 +41,13 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 		direction = (Constants.IS_PRACTICE_BOT?1:-1);
 		//robotShooter.alignTurret();
 		turretInit = 0;
+		robotShooter.cameraOffset = Constants.CAMERA_RIGHT_OFFSET+20;
+
 	}
 	
 	public void end(){
 		robotShooter.stopTimer();
+		robotDrive.driveAtAngleEnd();
 		robotDrive.enableBrake(false);
 	}
 
@@ -104,11 +108,11 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 		case 3:
 			robotPosition = robotDrive.getPosition();
 			System.out.println("robotPosition (3) " + direction*robotPosition[0]);
-			if( Math.abs(direction*robotPosition[0]) > (99/(Constants.WHEEL_DIAM*Math.PI))){
+			if( Math.abs(direction*robotPosition[0]) > (96/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(0.0, 95.0, true);
 				robotIntake.IntakeBalls(50);
 				autoStep = 4;
-			} else if( Math.abs(direction*robotPosition[0]) <= (99/(Constants.WHEEL_DIAM*Math.PI))){
+			} else if( Math.abs(direction*robotPosition[0]) <= (96/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAtAngleUpdate(-300, 95.0, true);
 				robotShooter.Shoot();
 				robotShooter.BallPump(-1);
@@ -127,7 +131,7 @@ public class StraightGearBallLeftHopper  extends AutonomousRoutine{
 			}else if (readyToShoot){
 				//robotShooter.getDistance();
 				robotShooter.Shoot(rpm);
-				robotShooter.Indexer(Constants.INDEXER_SPEED);				
+				robotShooter.Indexer(Constants.INDEXER_SPEED*.8);				
 			}
 			break;
 		

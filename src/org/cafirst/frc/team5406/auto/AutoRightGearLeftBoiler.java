@@ -67,7 +67,7 @@ public class AutoRightGearLeftBoiler  extends AutonomousRoutine{
 		switch (autoStep){
 
 		case 0:
-			if( Math.abs(direction*robotDistance[1]) > ((36)/(Constants.WHEEL_DIAM*Math.PI))){
+			if( Math.abs(direction*robotDistance[1]) > ((33)/(Constants.WHEEL_DIAM*Math.PI))){
 				robotDrive.driveAlongCurveInit(200, 60, -40, 2);
 				autoStep = 1;
 				angles[1] = Constants.navX.getYaw();

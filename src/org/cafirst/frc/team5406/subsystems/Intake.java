@@ -2,6 +2,8 @@ package org.cafirst.frc.team5406.subsystems;
 
 import org.cafirst.frc.team5406.robot.Constants;
 import com.ctre.CANTalon;
+import edu.wpi.first.wpilibj.Victor;
+
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
@@ -13,9 +15,10 @@ import org.cafirst.frc.team5406.subsystems.Subsystems;
 
 public class Intake extends Subsystems{
 	private CANTalon[] intakeMotors;
+	public static Victor gearLight = new Victor(Constants.GEAR_LIGHT);
+
 	private long startTime = 0;
     public static DigitalInput gearSwitch = new DigitalInput(Constants.GEAR_SWITCH);
-    public static DigitalOutput gearLight = new DigitalOutput(Constants.GEAR_LIGHT);
     private static DoubleSolenoid gearGripSolenoid = new DoubleSolenoid(Constants.GEAR_GRIP_FORWARD, Constants.GEAR_GRIP_REVERSE);;
     private static DoubleSolenoid gearLiftSolenoid = new DoubleSolenoid(Constants.GEAR_LIFT_FORWARD, Constants.GEAR_LIFT_REVERSE);;
 	private boolean grip = false;
@@ -60,7 +63,7 @@ public class Intake extends Subsystems{
 	
 	public void autoGearLift(){
 		SmartDashboard.putBoolean("Gear", haveGear());
-		gearLight.set(haveGear());
+		gearLight.set((haveGear()?1.0:0.0));
 		
 		/*if(haveGear() && !gear_lifted){
 			gear_lifted = true;
@@ -69,11 +72,7 @@ public class Intake extends Subsystems{
 	}
 	
 	public boolean haveGear(){
-		if(Constants.IS_PRACTICE_BOT){
-			return gearSwitch.get();
-		}else{
-			return gearSwitch.get();
-		}
+		return gearSwitch.get();
 	}
 	
 	public void StopIntake (){

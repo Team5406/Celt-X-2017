@@ -35,6 +35,8 @@ public class GearBallRightHopper  extends AutonomousRoutine{
 		robotDrive = _robotDrive;
 		robotIntake = _robotIntake;
 		robotShooter = _robotShooter;
+		robotShooter.cameraOffset = Constants.CAMERA_RIGHT_OFFSET;
+
 
 	}
 	
@@ -48,6 +50,8 @@ public class GearBallRightHopper  extends AutonomousRoutine{
 		angles[0] = Constants.navX.getYaw();
 		robotDrive.setVolageRampRate(75);
 		turretInit = 0;
+		robotShooter.cameraOffset = Constants.CAMERA_RIGHT_OFFSET;
+
 		
 	}
 	

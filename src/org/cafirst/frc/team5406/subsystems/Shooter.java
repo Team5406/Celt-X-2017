@@ -125,6 +125,22 @@ public class Shooter extends Subsystems{
 		
 		
 	}
+	public double getOffset(double position){
+		//return (Constants.CAMERA_LEFT_OFFSET+Constants.CAMERA_RIGHT_OFFSET)/2;
+		double centerTarget = (Constants.CAMERA_LEFT_OFFSET+Constants.CAMERA_RIGHT_OFFSET)/2;
+		if(Constants.FWDLimit < Integer.MAX_VALUE){
+			centerTarget= Constants.CAMERA_RIGHT_OFFSET+(Constants.CAMERA_LEFT_OFFSET-Constants.CAMERA_RIGHT_OFFSET)*((position*4096-Constants.FWDLimit)/Constants.TURRET_ROTATION_TICKS);
+		}
+		
+		centerTarget= Constants.CAMERA_RIGHT_OFFSET+(Constants.CAMERA_LEFT_OFFSET-Constants.CAMERA_RIGHT_OFFSET)*((-1*position*4096-Constants.FWDLimit)/Constants.TURRET_ROTATION_TICKS);
+	
+		SmartDashboard.putNumber("CenteringFWDLimit", Constants.FWDLimit);
+		SmartDashboard.putNumber("CenteringTicks", Constants.TURRET_ROTATION_TICKS);
+		SmartDashboard.putNumber("CenteringPosition", position);
+		SmartDashboard.putNumber("CenterTarget", centerTarget);
+		return centerTarget;
+		
+	}
 	
 	public void setTurretPID(double position){
 		double amount = Math.abs(turretMotors[0].getPosition() - position);
@@ -209,7 +225,7 @@ public class Shooter extends Subsystems{
 	
 	public void displayTurretPos(){
 		//getDistance();
- 		double center = cameraOffset;
+ 		double center = getOffset(turretMotors[0].getPosition());
  		double centerOffset = center-Constants.centerX;
 		double degreeOffset = Constants.AXIS_FOV*(centerOffset/Constants.IMAGE_WIDTH);
     	double turnTicks = ((degreeOffset/Constants.TURRET_ROTATION_DEG)*Constants.TURRET_ROTATION_TICKS)/4096;
@@ -248,7 +264,11 @@ public class Shooter extends Subsystems{
 			//rpm = 0.0975*topRight.y*topRight.y-38.543*topRight.y+8832.9; //21 balls auto
 			//rpm = 0.0975*topRight.y*topRight.y-38.543*topRight.y+(8858 - 5); //district champs
 			//rpm = 0.0972*topRight.y*topRight.y- 39.338*topRight.y+8965.1; //worlds
-			rpm = 0.0786*topRight.y*topRight.y- 31.386*topRight.y+8103.1 + 100; //iri
+			//rpm = 0.0786*topRight.y*topRight.y- 31.386*topRight.y+8103.1 + 100; //iri
+			//rpm = 0.131*topRight.y*topRight.y- 54.625*topRight.y+10642+75; //iri Robodrome
+			//rpm = 0.0715*topRight.y*topRight.y- 24.729*topRight.y+7003.8; //iri Robodrome
+			//rpm = 0.4221*topRight.y*topRight.y- 200.76*topRight.y+29207; //iri Robodrome
+			rpm = 0.0773*topRight.y*topRight.y- 28.257*topRight.y+7691.3-75; //iri Robodrome
 			
 		}
 		/*current_offset = indexerMotors[0].getOutputCurrent();
@@ -561,7 +581,7 @@ public class Shooter extends Subsystems{
 		    			//turretMotors[0].set(turretMotors[0].getPosition());
 		    			//getDistance();
 		            	System.out.println(System.nanoTime() + " " + turretCenteringCounter);
-		    			double center = cameraOffset;
+		    			double center = getOffset(turretMotors[0].getPosition());
 		    			System.out.println("Center" + center);
 		    	 		double centerOffset = center-Constants.centerX;
 		    			System.out.println("Constants.centerX" + Constants.centerX);
