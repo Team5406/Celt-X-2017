@@ -4,17 +4,22 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
+
+import com.revrobotics.spark.SparkMax;
 
 import frc.Constants;
 
 public class Drive extends SubsystemBase{  
-   public static WPI_TalonSRX leftDriveMotor = new WPI_TalonSRX(Constants.LEFT_DRIVE_MOTOR_ONE);
-   public static WPI_TalonSRX leftDriveSlaveOne = new WPI_TalonSRX(Constants.LEFT_DRIVE_MOTOR_TWO);
-   public static WPI_TalonSRX leftDriveSlaveTwo = new WPI_TalonSRX(Constants.LEFT_DRIVE_MOTOR_THREE);
-   public static WPI_TalonSRX rightDriveMotor = new WPI_TalonSRX(Constants.RIGHT_DRIVE_MOTOR_ONE);
-   public static WPI_TalonSRX rightDriveSlaveOne = new WPI_TalonSRX(Constants.RIGHT_DRIVE_MOTOR_TWO);
-   public static WPI_TalonSRX rightDriveSlaveTwo = new WPI_TalonSRX(Constants.RIGHT_DRIVE_MOTOR_THREE);
-   public static DifferentialDrive drive = new DifferentialDrive(leftDriveMotor, rightDriveMotor); 
+   public static SparkMax leftDriveMotor = new SparkMax(Constants.LEFT_DRIVE_MOTOR_ONE);
+   public static SparkMax leftDriveSlave = new SparkMax(Constants.LEFT_DRIVE_MOTOR_TWO);
+   public static SparkMax rightDriveMotor = new SparkMax(Constants.RIGHT_DRIVE_MOTOR_ONE);
+   public static SparkMax rightDriveSlave = new SparkMax(Constants.RIGHT_DRIVE_MOTOR_TWO);
 
     public static void setupMotors(){
         leftDriveSlaveOne.follow(leftDriveMotor);
